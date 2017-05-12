@@ -1,6 +1,7 @@
 <?php
 
-use Clue\React\Socks\Client;
+use Clue\React\HttpProxy\ProxyConnector as HttpClient;
+use Clue\React\Socks\Client as SocketClient;
 use Clue\React\Socks\Server;
 use React\Socket\Server as Socket;
 use React\Socket\Connector;
@@ -19,7 +20,11 @@ $loop = React\EventLoop\Factory::create();
 // set next SOCKS server chain -> p1 -> p2 -> p3 -> destination
 $connector = new Connector($loop);
 foreach ($path as $proxy) {
-    $connector = new Client($proxy, $connector);
+    if (strpos($proxy, 'http://') === 0) {
+        $connector = new HttpClient($proxy, $connector);
+    } else {
+        $connector = new SocksClient($proxy, $connector);
+    }
 }
 
 // listen on 127.0.0.1:1080 or first argument
