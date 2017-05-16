@@ -33,15 +33,19 @@ $pos = strpos($address, '://');
 $schema = 'socks';
 if ($pos !== false) {
     $schema = substr($address, 0, $pos);
-    if (!in_array($schema, array('socks'))) {
+    if (!in_array($schema, array('socks', 'http'))) {
         throw new \InvalidArgumentException('Invalid URI schema "' . $schema . '" in listening address');
     }
     $address = substr($address, $pos + 3);
 }
 $socket = new Socket($address, $loop);
 
-// start a new server which forwards all connections to the other SOCKS server
-$server = new SocksServer($loop, $socket, $connector);
+// start new proxy server which uses the above connector for forwarding
+if ($schema === 'http') {
+    $server = new HttpConnectServer($loop, $socket, $connector);
+} else {
+    $server = new SocksServer($loop, $socket, $connector);
+}
 
 $addr = str_replace('tcp://', $schema . '://', $socket->getAddress());
 echo 'LeProxy is now listening on ' . $addr . PHP_EOL;

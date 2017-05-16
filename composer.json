@@ -1,6 +1,12 @@
 {
     "require": {
+        "clue/http-proxy-react": "^0.3.1",
         "clue/socks-react": "^0.8.2",
-        "clue/http-proxy-react": "^0.3.1"
+        "react/http": "dev-master"
+    },
+    "autoload": {
+        "files": [
+            "src/HttpConnectServer.php"
+        ]
     }
 }
