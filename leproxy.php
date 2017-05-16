@@ -42,7 +42,7 @@ $socket = new Socket($address, $loop);
 
 // start new proxy server which uses the above connector for forwarding
 if ($schema === 'http') {
-    $server = new HttpConnectServer($loop, $socket, $connector);
+    $server = new HttpProxyServer($loop, $socket, $connector);
 } else {
     $server = new SocksServer($loop, $socket, $connector);
 }
