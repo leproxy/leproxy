@@ -6,7 +6,7 @@
     },
     "autoload": {
         "files": [
-            "src/HttpConnectServer.php"
+            "src/HttpProxyServer.php"
         ]
     }
 }
