@@ -1,8 +1,8 @@
 <?php
 
 use Clue\React\HttpProxy\ProxyConnector as HttpClient;
-use Clue\React\Socks\Client as SocketClient;
-use Clue\React\Socks\Server;
+use Clue\React\Socks\Client as SocksClient;
+use Clue\React\Socks\Server as SocksServer;
 use React\Socket\Server as Socket;
 use React\Socket\Connector;
 
@@ -28,12 +28,23 @@ foreach ($path as $proxy) {
 }
 
 // listen on 127.0.0.1:1080 or first argument
-$socket = new Socket($listen, $loop);
+$address = $listen;
+$pos = strpos($address, '://');
+$schema = 'socks';
+if ($pos !== false) {
+    $schema = substr($address, 0, $pos);
+    if (!in_array($schema, array('socks'))) {
+        throw new \InvalidArgumentException('Invalid URI schema "' . $schema . '" in listening address');
+    }
+    $address = substr($address, $pos + 3);
+}
+$socket = new Socket($address, $loop);
 
 // start a new server which forwards all connections to the other SOCKS server
-$server = new Server($loop, $socket, $connector);
+$server = new SocksServer($loop, $socket, $connector);
 
-echo 'LeProxy is now listening on ' . $socket->getAddress() . PHP_EOL;
+$addr = str_replace('tcp://', $schema . '://', $socket->getAddress());
+echo 'LeProxy is now listening on ' . $addr . PHP_EOL;
 if ($path) {
     echo 'Forwarding via: ' . implode(' -> ', $path) . PHP_EOL;
 }
