@@ -1,20 +1,27 @@
 <?php
 
 use Psr\Http\Message\ServerRequestInterface;
-use RingCentral\Psr7;
 use React\EventLoop\LoopInterface;
 use React\Http\Response;
+use React\HttpClient\Client as HttpClient;
+use React\HttpClient\Response as ClientResponse;
+use React\Promise\Deferred;
 use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
 use React\Socket\ServerInterface;
-use React\Promise\Promise;
-use React\Stream\ThroughStream;
-use React\Http\HttpBodyStream;
 
 class HttpProxyServer
 {
-    public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector)
+    private $client;
+
+    public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
     {
+        if ($client === null) {
+            $client = new HttpClient($loop, $connector);
+        }
+
+        $this->client = $client;
+
         $that = $this;
         $server = new \React\Http\Server($socket, function (ServerRequestInterface $request) use ($connector, $that) {
             if (strpos($request->getRequestTarget(), '://') !== false) {
@@ -85,98 +92,51 @@ class HttpProxyServer
     /** @internal */
     public function handlePlainRequest(ServerRequestInterface $request, ConnectorInterface $connector)
     {
-        if ($request->getBody()->getSize() === null) {
-            return new Response(
-                411,
-                array('Content-Type' => 'text/plain'),
-                'The server refuses to accept the request without a defined Content- Length header'
-            );
+        $incoming = $request->withoutHeader('Host')->withoutHeader('Connection');
+
+        $headers = array();
+        foreach ($incoming->getHeaders() as $name => $values) {
+            $headers[$name] = implode(', ', $values);
         }
 
-        // prepare outgoing client request by updating request-target and Host header
-        $host = (string)$request->getUri()->withScheme('')->withPath('')->withQuery('');
-        $target = (string)$request->getUri()->withScheme('')->withHost('')->withPort(null);
-        if ($target === '') {
-            $target = $request->getMethod() === 'OPTIONS' ? '*' : '/';
-        }
-        $outgoing = $request->withRequestTarget($target)->withHeader('Host', $host);
+        $outgoing = $this->client->request(
+            $incoming->getMethod(),
+            (string)$incoming->getUri(),
+            $headers,
+            $incoming->getProtocolVersion()
+        );
 
-        $connect = $request->getUri()->withScheme('tcp')->withUserInfo('')->withPath('')->withQuery('');
-        if ($connect->getPort() === null) {
-            $connect = $connect->withPort(80);
-        }
-
-        // pause consuming request body
-        $body = $request->getBody();
-        $body->pause();
-
-        $buffer = '';
-        $body->on('data', function ($chunk) use (&$buffer) {
-            $buffer .= $chunk;
+        $deferred = new Deferred(function () use ($outgoing) {
+            $outgoing->close();
+            throw new \RuntimeException('Request cancelled');
         });
 
-        // try to connect to given target host
-        return $connector->connect($connect)->then(
-            function (ConnectionInterface $remote) use ($body, &$buffer, $outgoing) {
-                // write outgoing request headers
-                $remote->write(Psr7\str($outgoing));
+        $outgoing->on('response', function (ClientResponse $response) use ($deferred) {
+            $deferred->resolve(new Response(
+                $response->getCode(),
+                $response->getHeaders(),
+                $response,
+                $response->getVersion(),
+                $response->getReasonPhrase()
+            ));
+        });
 
-                // connection established => forward data
-                $body->pipe($remote);
-                $body->resume();
-
-                if ($buffer !== '') {
-                    $remote->write($buffer);
-                    $buffer = '';
-                }
-
-                return new Promise(function ($resolve, $reject) use ($remote) {
-                    $remote->on('data', function ($chunk) use (&$buffer, $resolve, $remote) {
-                        $buffer .= $chunk;
-                        $pos = strpos($buffer, "\r\n\r\n");
-
-                        if ($pos !== false) {
-                            try {
-                                $response = Psr7\parse_response(substr($buffer, 0, $pos));
-                            } catch (\Exception $e) {
-                                $resolve(new Response(
-                                    502,
-                                    array('Content-Type' => 'text/plain'),
-                                    'Invalid response: ' . $e->getMessage()
-                                ));
-                                $remote->close();
-                                return;
-                            }
-
-                            $stream = new ThroughStream();
-                            $response = $response->withBody(new HttpBodyStream($stream, null));
-
-                            $resolve($response);
-
-                            $buffer = (string)substr($buffer, $pos + 4);
-                            if ($buffer !== null) {
-                                $stream->emit('data', array($buffer));
-                                $buffer = '';
-                            }
-
-                            $remote->pipe($stream);
-                        }
-                    });
-                });
-
-                return new Response(
-                    200,
-                    array(),
-                    $remote
-                );
-            },
-            function ($e) use ($connect) {
-                return new Response(
-                    502,
-                    array('Content-Type' => 'text/plain'),
-                    'Unable to connect to ' . $connect . ': ' . $e->getMessage()
-                );
+        $outgoing->on('error', function (Exception $e) use ($deferred) {
+            $message = '';
+            while ($e !== null) {
+                $message .= $e->getMessage() . "\n";
+                $e = $e->getPrevious();
             }
-        );
+
+            $deferred->resolve(new Response(
+                502,
+                array('Content-Type' => 'text/plain'),
+                'Unable to request: ' . $message
+            ));
+        });
+
+        $incoming->getBody()->pipe($outgoing);
+
+        return $deferred->promise();
     }
 }
