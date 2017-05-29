@@ -398,18 +398,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http.git",
-                "reference": "601f21806b991780961038c4247f4bc6fac1018e"
+                "reference": "ca1fd997bc289681951c8f06f2a250d81d1cb236"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http/zipball/601f21806b991780961038c4247f4bc6fac1018e",
-                "reference": "601f21806b991780961038c4247f4bc6fac1018e",
+                "url": "https://api.github.com/repos/reactphp/http/zipball/ca1fd997bc289681951c8f06f2a250d81d1cb236",
+                "reference": "ca1fd997bc289681951c8f06f2a250d81d1cb236",
                 "shasum": ""
             },
             "require": {
                 "evenement/evenement": "^2.0 || ^1.0",
                 "php": ">=5.3.0",
-                "react/promise": "^2.0 || ^1.1",
+                "react/promise": "^2.1 || ^1.2.1",
                 "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5",
                 "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.6",
                 "ringcentral/psr7": "^1.2"
@@ -439,7 +439,7 @@
                 "server",
                 "streaming"
             ],
-            "time": "2017-05-16 12:29:21"
+            "time": "2017-05-28 20:49:48"
         },
         {
             "name": "react/http-client",

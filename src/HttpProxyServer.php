@@ -23,7 +23,7 @@ class HttpProxyServer
         $this->client = $client;
 
         $that = $this;
-        $server = new \React\Http\Server($socket, function (ServerRequestInterface $request) use ($connector, $that) {
+        $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($connector, $that) {
             if (strpos($request->getRequestTarget(), '://') !== false) {
                 return $that->handlePlainRequest($request, $connector);
             }
@@ -39,33 +39,18 @@ class HttpProxyServer
             );
         });
 
+        $server->listen($socket);
+
         $server->on('error', 'printf');
     }
 
     /** @internal */
     public function handleConnectRequest(ServerRequestInterface $request, ConnectorInterface $connector)
     {
-        // pause consuming request body
-        $body = $request->getBody();
-        $body->pause();
-
-        $buffer = '';
-        $body->on('data', function ($chunk) use (&$buffer) {
-            $buffer .= $chunk;
-        });
-
         // try to connect to given target host
-        $promise = $connector->connect($request->getRequestTarget())->then(
-            function (ConnectionInterface $remote) use ($body, &$buffer) {
+        return $connector->connect($request->getRequestTarget())->then(
+            function (ConnectionInterface $remote) {
                 // connection established => forward data
-                $body->pipe($remote);
-                $body->resume();
-
-                if ($buffer !== '') {
-                    $remote->write($buffer);
-                    $buffer = '';
-                }
-
                 return new Response(
                     200,
                     array(),
@@ -80,13 +65,6 @@ class HttpProxyServer
                 );
             }
         );
-
-        // cancel pending connection if request closes prematurely
-        $body->on('close', function () use ($promise) {
-            $promise->cancel();
-        });
-
-        return $promise;
     }
 
     /** @internal */
