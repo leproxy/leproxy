@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc0d334579e453881a6977057f2c0da9",
+    "content-hash": "5402f865f870792544832a18ae45369c",
     "packages": [
         {
             "name": "clue/http-proxy-react",
@@ -394,22 +394,22 @@
         },
         {
             "name": "react/http",
-            "version": "dev-master",
+            "version": "v0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http.git",
-                "reference": "601f21806b991780961038c4247f4bc6fac1018e"
+                "reference": "8c806074b6637cfd6cbb7049d5d500b18bb56cd4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http/zipball/601f21806b991780961038c4247f4bc6fac1018e",
-                "reference": "601f21806b991780961038c4247f4bc6fac1018e",
+                "url": "https://api.github.com/repos/reactphp/http/zipball/8c806074b6637cfd6cbb7049d5d500b18bb56cd4",
+                "reference": "8c806074b6637cfd6cbb7049d5d500b18bb56cd4",
                 "shasum": ""
             },
             "require": {
                 "evenement/evenement": "^2.0 || ^1.0",
                 "php": ">=5.3.0",
-                "react/promise": "^2.0 || ^1.1",
+                "react/promise": "^2.1 || ^1.2.1",
                 "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5",
                 "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.6",
                 "ringcentral/psr7": "^1.2"
@@ -439,7 +439,7 @@
                 "server",
                 "streaming"
             ],
-            "time": "2017-05-16 12:29:21"
+            "time": "2017-05-29T15:41:07+00:00"
         },
         {
             "name": "react/http-client",
@@ -738,9 +738,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "react/http": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
