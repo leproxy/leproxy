@@ -2,7 +2,8 @@
     "require": {
         "clue/http-proxy-react": "^0.3.1",
         "clue/socks-react": "^0.8.2",
-        "react/http": "dev-master"
+        "react/http": "dev-master",
+        "react/http-client": "^0.5"
     },
     "autoload": {
         "files": [
