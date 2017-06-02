@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5402f865f870792544832a18ae45369c",
+    "content-hash": "29f774f9e2cf09f6d0eba1821f4b97c2",
     "packages": [
         {
             "name": "clue/http-proxy-react",
@@ -741,6 +741,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.4"
+    },
     "platform-dev": []
 }
