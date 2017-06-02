@@ -11,4 +11,5 @@ install:
   - composer install
 
 script:
+  - vendor/bin/phpunit
   - ./tests/acceptance.sh

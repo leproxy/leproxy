@@ -8,7 +8,7 @@ use React\Socket\Connector;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$listen = isset($argv[1]) ? $argv[1] : 1080;
+$listen = isset($argv[1]) ? $argv[1] : '127.0.0.1:1080';
 $path = isset($argv[2]) ? array_slice($argv, 2) : array();
 
 // Alternatively, you can also hard-code these values like this:
@@ -28,27 +28,25 @@ foreach ($path as $proxy) {
 }
 
 // listen on 127.0.0.1:1080 or first argument
-$address = $listen;
-$pos = strpos($address, '://');
-$schema = 'socks';
-if ($pos !== false) {
-    $schema = substr($address, 0, $pos);
-    if (!in_array($schema, array('socks', 'http'))) {
-        throw new \InvalidArgumentException('Invalid URI schema "' . $schema . '" in listening address');
-    }
-    $address = substr($address, $pos + 3);
+$pos = strpos($listen, '://');
+if ($pos === false) {
+    $listen = 'http://' . $listen;
 }
-$socket = new Socket($address, $loop);
+
+$parts = parse_url($listen);
+if (!$parts || !isset($parts['scheme'], $parts['host'], $parts['port'])) {
+    throw new \InvalidArgumentException('Invalid URI for listening address');
+}
+
+$socket = new Socket($parts['host'] . ':' . $parts['port'], $loop);
 
 // start new proxy server which uses the above connector for forwarding
-if ($schema === 'http') {
-    $server = new HttpProxyServer($loop, $socket, $connector);
-} else {
-    $server = new SocksServer($loop, $socket, $connector);
-}
+$unification = new ProtocolDetector($socket);
+$http = new HttpProxyServer($loop, $unification->http, $connector);
+$socks = new SocksServer($loop, $unification->socks, $connector);
 
-$addr = str_replace('tcp://', $schema . '://', $socket->getAddress());
-echo 'LeProxy is now listening on ' . $addr . PHP_EOL;
+$addr = str_replace('tcp://', 'http://', $socket->getAddress());
+echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . PHP_EOL;
 if ($path) {
     echo 'Forwarding via: ' . implode(' -> ', $path) . PHP_EOL;
 }

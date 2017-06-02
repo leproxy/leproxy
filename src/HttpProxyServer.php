@@ -35,7 +35,7 @@ class HttpProxyServer
             return new Response(
                 405,
                 array('Content-Type' => 'text/plain', 'Allow' => 'CONNECT'),
-                'This is a HTTP CONNECT (secure HTTPS) proxy'
+                'LeProxy HTTP/SOCKS proxy'
             );
         });
 
