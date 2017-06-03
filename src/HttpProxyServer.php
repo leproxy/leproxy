@@ -12,6 +12,7 @@ use React\Socket\ServerInterface;
 
 class HttpProxyServer
 {
+    private $connector;
     private $client;
 
     public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
@@ -20,35 +21,39 @@ class HttpProxyServer
             $client = new HttpClient($loop, $connector);
         }
 
+        $this->connector = $connector;
         $this->client = $client;
 
         $that = $this;
-        $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($connector, $that) {
-            if (strpos($request->getRequestTarget(), '://') !== false) {
-                return $that->handlePlainRequest($request, $connector);
-            }
-
-            if ($request->getMethod() === 'CONNECT') {
-                return $that->handleConnectRequest($request, $connector);
-            }
-
-            return new Response(
-                405,
-                array('Content-Type' => 'text/plain', 'Allow' => 'CONNECT'),
-                'LeProxy HTTP/SOCKS proxy'
-            );
-        });
-
+        $server = new \React\Http\Server(array($this, 'handleRequest'));
         $server->listen($socket);
 
         $server->on('error', 'printf');
     }
 
     /** @internal */
-    public function handleConnectRequest(ServerRequestInterface $request, ConnectorInterface $connector)
+    public function handleRequest(ServerRequestInterface $request)
+    {
+        if (strpos($request->getRequestTarget(), '://') !== false) {
+            return $this->handlePlainRequest($request);
+        }
+
+        if ($request->getMethod() === 'CONNECT') {
+            return $this->handleConnectRequest($request);
+        }
+
+        return new Response(
+            405,
+            array('Content-Type' => 'text/plain', 'Allow' => 'CONNECT'),
+            'LeProxy HTTP/SOCKS proxy'
+        );
+    }
+
+    /** @internal */
+    public function handleConnectRequest(ServerRequestInterface $request)
     {
         // try to connect to given target host
-        return $connector->connect($request->getRequestTarget())->then(
+        return $this->connector->connect($request->getRequestTarget())->then(
             function (ConnectionInterface $remote) {
                 // connection established => forward data
                 return new Response(
@@ -68,7 +73,7 @@ class HttpProxyServer
     }
 
     /** @internal */
-    public function handlePlainRequest(ServerRequestInterface $request, ConnectorInterface $connector)
+    public function handlePlainRequest(ServerRequestInterface $request)
     {
         $incoming = $request->withoutHeader('Host')->withoutHeader('Connection');
 
