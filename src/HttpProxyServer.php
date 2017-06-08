@@ -12,7 +12,9 @@ use React\Socket\ServerInterface;
 
 class HttpProxyServer
 {
+    private $connector;
     private $client;
+    private $auth = null;
 
     public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
     {
@@ -20,35 +22,63 @@ class HttpProxyServer
             $client = new HttpClient($loop, $connector);
         }
 
+        $this->connector = $connector;
         $this->client = $client;
 
         $that = $this;
-        $server = new \React\Http\Server(function (ServerRequestInterface $request) use ($connector, $that) {
-            if (strpos($request->getRequestTarget(), '://') !== false) {
-                return $that->handlePlainRequest($request, $connector);
-            }
-
-            if ($request->getMethod() === 'CONNECT') {
-                return $that->handleConnectRequest($request, $connector);
-            }
-
-            return new Response(
-                405,
-                array('Content-Type' => 'text/plain', 'Allow' => 'CONNECT'),
-                'LeProxy HTTP/SOCKS proxy'
-            );
-        });
-
+        $server = new \React\Http\Server(array($this, 'handleRequest'));
         $server->listen($socket);
 
         $server->on('error', 'printf');
     }
 
+    public function setAuthArray(array $auth)
+    {
+        $this->auth = $auth;
+    }
+
     /** @internal */
-    public function handleConnectRequest(ServerRequestInterface $request, ConnectorInterface $connector)
+    public function handleRequest(ServerRequestInterface $request)
+    {
+        if ($this->auth !== null) {
+            $auth = null;
+            $value = $request->getHeaderLine('Proxy-Authorization');
+            if (strpos($value, 'Basic ') === 0) {
+                $value = base64_decode(substr($value, 6), true);
+                if ($value !== false) {
+                    $auth = explode(':', $value, 2) + array(1 => '');
+                }
+            }
+
+            if (!$auth || !isset($this->auth[$auth[0]]) || $this->auth[$auth[0]] !== $auth[1]) {
+                return new Response(
+                    407,
+                    array('Proxy-Authenticate' => 'Basic realm="LeProxy HTTP/SOCKS proxy"', 'Content-Type' => 'text/plain'),
+                    'LeProxy HTTP/SOCKS proxy: Valid proxy authentication required'
+                );
+            }
+        }
+
+        if (strpos($request->getRequestTarget(), '://') !== false) {
+            return $this->handlePlainRequest($request);
+        }
+
+        if ($request->getMethod() === 'CONNECT') {
+            return $this->handleConnectRequest($request);
+        }
+
+        return new Response(
+            405,
+            array('Content-Type' => 'text/plain', 'Allow' => 'CONNECT'),
+            'LeProxy HTTP/SOCKS proxy'
+        );
+    }
+
+    /** @internal */
+    public function handleConnectRequest(ServerRequestInterface $request)
     {
         // try to connect to given target host
-        return $connector->connect($request->getRequestTarget())->then(
+        return $this->connector->connect($request->getRequestTarget())->then(
             function (ConnectionInterface $remote) {
                 // connection established => forward data
                 return new Response(
@@ -68,9 +98,12 @@ class HttpProxyServer
     }
 
     /** @internal */
-    public function handlePlainRequest(ServerRequestInterface $request, ConnectorInterface $connector)
+    public function handlePlainRequest(ServerRequestInterface $request)
     {
-        $incoming = $request->withoutHeader('Host')->withoutHeader('Connection');
+        $incoming = $request->withoutHeader('Host')
+                            ->withoutHeader('Connection')
+                            ->withoutHeader('Proxy-Authorization')
+                            ->withoutHeader('Proxy-Connection');
 
         $headers = array();
         foreach ($incoming->getHeaders() as $name => $values) {

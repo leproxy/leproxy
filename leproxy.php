@@ -45,8 +45,19 @@ $unification = new ProtocolDetector($socket);
 $http = new HttpProxyServer($loop, $unification->http, $connector);
 $socks = new SocksServer($loop, $unification->socks, $connector);
 
+// require authentication if listening URI contains username/password
+if (isset($parts['user']) || isset($parts['pass'])) {
+    $auth = array(
+        rawurldecode($parts['user']) => isset($parts['pass']) ? rawurldecode($parts['pass']) : ''
+    );
+
+    $http->setAuthArray($auth);
+    $socks->setAuthArray($auth);
+}
+
 $addr = str_replace('tcp://', 'http://', $socket->getAddress());
 echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . PHP_EOL;
+
 if ($path) {
     echo 'Forwarding via: ' . implode(' -> ', $path) . PHP_EOL;
 }
