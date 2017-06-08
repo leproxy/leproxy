@@ -100,7 +100,10 @@ class HttpProxyServer
     /** @internal */
     public function handlePlainRequest(ServerRequestInterface $request)
     {
-        $incoming = $request->withoutHeader('Host')->withoutHeader('Connection');
+        $incoming = $request->withoutHeader('Host')
+                            ->withoutHeader('Connection')
+                            ->withoutHeader('Proxy-Authorization')
+                            ->withoutHeader('Proxy-Connection');
 
         $headers = array();
         foreach ($incoming->getHeaders() as $name => $values) {
