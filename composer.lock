@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e4c0ce16bcfb6a55440047dbe4399319",
+    "content-hash": "eb20cc219b7102566eee61bc179622d5",
     "packages": [
         {
             "name": "clue/http-proxy-react",
-            "version": "v0.3.1",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-http-proxy-react.git",
-                "reference": "e66493659c0b787c52ba58532958741270640074"
+                "reference": "c50c72b88e4bc111421c9ab05e7ce19b3943fadb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-http-proxy-react/zipball/e66493659c0b787c52ba58532958741270640074",
-                "reference": "e66493659c0b787c52ba58532958741270640074",
+                "url": "https://api.github.com/repos/clue/php-http-proxy-react/zipball/c50c72b88e4bc111421c9ab05e7ce19b3943fadb",
+                "reference": "c50c72b88e4bc111421c9ab05e7ce19b3943fadb",
                 "shasum": ""
             },
             "require": {
@@ -56,7 +56,7 @@
                 "proxy",
                 "reactphp"
             ],
-            "time": "2017-05-10T18:42:44+00:00"
+            "time": "2017-06-11T11:09:42+00:00"
         },
         {
             "name": "clue/socks-react",
