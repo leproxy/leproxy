@@ -83,13 +83,42 @@ After configuring for example your browser settings you can surf via LeProxy!
 
 ## Clients
 
-Once LeProxy is running, you can start using it with pretty much any client software.
-For this, you'll need to configure your browser settings to use this proxy server
-with the listening address as configured above:
+Once LeProxy is running, you can start using it with pretty much any client
+software.
+The below example assumes you want to use a web browser, but LeProxy can
+actually be used with any client software that provides proxy support, such as
+an email or IM client.
+
+Most clients provide settings to manually configure a proxy server in their
+settings/preferences dialogs.
+You can simply set the details from the listening address as configured above:
 
 * Protocol: HTTP or SOCKS
 * Server: 127.0.0.1
 * Port: 1080
+
+> Note that these settings have to be adjusted to your actual network settings.
+  If you fail to provide correct settings, no further connection will succeed.
+  In this case, simply remove or disable these settings again.
+  The same may apply if you're roaming in another network or the proxy server is
+  temporarily not available.
+
+Many clients (in particular web browsers and mobile phones) also support Proxy
+Auto-Configuration (PAC) by specifying a PAC URL.
+Using PAC is often beneficial because most clients will simply ignore the proxy
+settings if the PAC URL can not be reached, such as when you're roaming in
+another network or the proxy server is temporarily not available.
+Simply use the URL to your LeProxy instance in the following format:
+
+```
+http://127.0.0.1:1080/proxy.pac
+```
+
+> Note that these settings have to be adjusted to your actual network settings.
+  If you fail to provide correct settings, you may or may not be able to
+  establish further connections, as most clients will simply ignore invalid
+  settings.
+  If your client disallows this, simply remove or disable these settings again.
 
 ## License
 
