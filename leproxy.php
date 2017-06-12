@@ -17,10 +17,10 @@ $path = isset($argv[2]) ? array_slice($argv, 2) : array();
 
 $loop = React\EventLoop\Factory::create();
 
-// set next SOCKS server chain -> p1 -> p2 -> p3 -> destination
+// set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = new Connector($loop);
 foreach ($path as $proxy) {
-    if (strpos($proxy, 'http://') === 0) {
+    if (strpos($proxy, '://') === false || strpos($proxy, 'http://') === 0) {
         $connector = new HttpClient($proxy, $connector);
     } else {
         $connector = new SocksClient($proxy, $connector);

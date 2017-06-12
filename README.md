@@ -97,7 +97,7 @@ $ php leproxy.php 0.0.0.0:1080 socks://user:pass@127.0.0.1:8080
 
 > The upstream proxy server URI MUST contain a hostname or IP and SHOULD include
   a port unless it is the standard port for this proxy scheme.
-  If no scheme is given, the `socks://` scheme will be assumed.
+  If no scheme is given, the `http://` scheme will be assumed.
   The `http://` scheme uses default port 80, all `socks[5|4|4a]://` schemes
   default to port 1080.
   The `http://` and `socks[5]://` schemes support optional username/password
