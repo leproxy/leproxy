@@ -111,7 +111,7 @@ another network or the proxy server is temporarily not available.
 Simply use the URL to your LeProxy instance in the following format:
 
 ```
-http://127.0.0.1:1080/proxy.pac
+http://127.0.0.1:1080/pac
 ```
 
 > Note that these settings have to be adjusted to your actual network settings.

@@ -9,8 +9,10 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 --location ht
 out=$(curl -v --head --silent --fail --proxy socks5://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks4a://127.0.0.1:8180 --location http://github.com  2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
-# ensure PAC URL returns valid file
-out=$(curl -v --silent --fail http://127.0.0.1:8180/proxy.pac 2>&1) && echo "$out" | grep -q PROXY && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+# ensure PAC URL returns valid file for direct access
+out=$(curl -v --silent --fail http://127.0.0.1:8180/pac 2>&1) && echo "$out" | grep -q PROXY && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --silent --fail -x DELETE http://127.0.0.1:8180/pac 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --silent --fail --proxy http://127.0.0.1:8180 http://test.invalid/pac 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 
 # unneeded authentication should work
 out=$(curl -v --head --silent --fail --proxy http://user:pass@127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
