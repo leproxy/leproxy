@@ -40,6 +40,13 @@ class HttpProxyServer
     /** @internal */
     public function handleRequest(ServerRequestInterface $request)
     {
+        // direct (origin / non-proxy) requests start with a slash
+        $direct = substr($request->getRequestTarget(), 0, 1) === '/';
+
+        if ($direct && $request->getUri()->getPath() === '/pac') {
+            return $this->handlePac($request);
+        }
+
         if ($this->auth !== null) {
             $auth = null;
             $value = $request->getHeaderLine('Proxy-Authorization');
@@ -149,5 +156,28 @@ class HttpProxyServer
         $incoming->getBody()->pipe($outgoing);
 
         return $deferred->promise();
+    }
+
+    /** @internal */
+    public function handlePac(ServerRequestInterface $request)
+    {
+        if ($request->getMethod() !== 'GET' && $request->getMethod() !== 'HEAD') {
+            return new Response(
+                405,
+                array('Accept' => 'GET')
+            );
+        }
+
+        // use proxy URI from current request (and make sure to include port even if default)
+        $uri = $request->getUri()->getHost() . ':' . $request->getUri()->getPort();
+        if (substr($uri, -1) === ':') {
+            $uri .= '80';
+        }
+
+        return new Response(
+            200,
+            array('Content-Type' => 'application/x-ns-proxy-autoconfig'),
+            'function FindProxyForURL(url, host) { return "PROXY ' . $uri . '"; }' . PHP_EOL
+        );
     }
 }
