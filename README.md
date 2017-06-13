@@ -115,6 +115,12 @@ the chain:
 $ php leproxy.php 0.0.0.0:1080 127.1.1.1:1080 127.2.2.2:1080 127.3.3.3:1080
 ```
 
+To keep track of the requests on the proxy you can activate the logging:
+
+```bash
+$ php leproxy.php --log
+```
+
 ## Clients
 
 Once LeProxy is running, you can start using it with pretty much any client
