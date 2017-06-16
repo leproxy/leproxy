@@ -28,8 +28,6 @@ class HttpProxyServer
         $that = $this;
         $server = new \React\Http\Server(array($this, 'handleRequest'));
         $server->listen($socket);
-
-        $server->on('error', 'printf');
     }
 
     public function setAuthArray(array $auth)
