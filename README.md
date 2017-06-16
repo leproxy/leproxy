@@ -78,8 +78,42 @@ $ php leproxy.php username:password@0.0.0.0:1080
 > If the username or password contains special characters, make sure to use
   URL encoded values (percent-encoding) such as `p%40ss` for `p@ss`.
 
-LeProxy is now successfully running.
-After configuring for example your browser settings you can surf via LeProxy!
+By default, Leproxy creates a direct connection to the destination address for
+each incoming proxy request.
+In this mode, the destination doesn't see the original client address, but only
+the address of your LeProxy instance.
+If you want a higher level degree of anonymity, you can use *proxy forwarding*,
+where the connection will be tunneled through another upstream proxy server.
+This may also be useful if your upstream proxy address changes regularly (such
+as when using public proxies), but you do not want to reconfigure your client
+every time or if your upstream proxy requires a feature that your client does
+not support, such as requiring authentication or a different proxy protocol.
+You can simply pass your upstream proxy server address as another URL parameter
+after the listening address like this:
+
+```bash
+$ php leproxy.php 0.0.0.0:1080 socks://user:pass@127.0.0.1:8080
+```
+
+> The upstream proxy server URI MUST contain a hostname or IP and SHOULD include
+  a port unless it is the standard port for this proxy scheme.
+  If no scheme is given, the `http://` scheme will be assumed.
+  The `http://` scheme uses default port 80, all `socks[5|4|4a]://` schemes
+  default to port 1080.
+  The `http://` and `socks[5]://` schemes support optional username/password
+  authentication as in the above example.
+
+By appending additional upstream proxy servers, this can effectively be turned
+into *proxy chaining*, where each incoming proxy request will be forwarded
+through the chain of all upstream proxy servers from left to right.
+This comes at the price of increased latency, but may provide a higher level
+degree of anonymity, as each proxy server in the chain only sees its direct
+communication partners and the destination only sees the last proxy server in
+the chain:
+
+```bash
+$ php leproxy.php 0.0.0.0:1080 127.1.1.1:1080 127.2.2.2:1080 127.3.3.3:1080
+```
 
 ## Clients
 

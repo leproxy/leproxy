@@ -36,5 +36,21 @@ out=$(curl -v --head --silent --fail --proxy socks5://user:pass@127.0.0.1:8180 h
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactphp.org 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 out=$(curl -v --head --silent --fail --proxy socks5://127.0.0.1:8180 http://reactphp.org 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 
+# start another LeProxy instance for HTTP proxy chaining / nesting
+php leproxy.php 127.0.0.1:8181 http://user:pass@127.0.0.1:8180 &
+sleep 1
+
+# client does not need authentication because first chain passes to next via HTTP
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8181 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8181 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
+# start another LeProxy instance for SOCKS proxy chaining / nesting
+php leproxy.php 127.0.0.1:8182 socks://user:pass@127.0.0.1:8180 &
+sleep 1
+
+# client does not need authentication because first chain passes to next via SOCKS
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8182 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8182 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
 killall php 2>&- 1>&- || true
 echo DONE
