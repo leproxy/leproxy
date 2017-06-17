@@ -3,7 +3,7 @@
         "php": ">=5.4",
         "clue/http-proxy-react": "^1.1",
         "clue/socks-react": "^0.8.2",
-        "react/http": "^0.7",
+        "react/http": "^0.7.1",
         "react/http-client": "^0.5"
     },
     "require-dev": {
