@@ -122,7 +122,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, 0.2);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("\r\n\r\nHTTP/1.1 200 OK\r\n", $response);
@@ -131,7 +131,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 
     public function testConnectInvalidUriReturns502()
     {
-        // connect to proxy and send CONNECT requets a
+        // connect to proxy and send CONNECT request
         $connector = new Connector($this->loop);
         $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
             $conn->write("CONNECT 127.0.0.1:2 HTTP/1.1\r\n\r\n");
@@ -143,5 +143,93 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $this->assertStringStartsWith("HTTP/1.1 502 Bad Gateway\r\n", $response);
         $this->assertContains("\r\n\r\nUnable to connect:", $response);
+    }
+
+    public function testPacDirect()
+    {
+        // connect to proxy and send direct request
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("GET /pac HTTP/1.1\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("PROXY", $response);
+    }
+
+    public function testPacInvalidMethod()
+    {
+        // connect to proxy and send direct request with non-GET method
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("POST /pac HTTP/1.1\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 405 Method Not Allowed\r\n", $response);
+    }
+
+    public function testPacPlain()
+    {
+        // connect to proxy and send plain request
+        $connector = new Connector($this->loop);
+
+        $uri = str_replace('tcp:', 'http:', $this->proxy);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) use ($uri) {
+            $conn->write("GET $uri/pac HTTP/1.1\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("PROXY", $response);
+    }
+
+    public function testPacPlainToInvalidHostWillReturnError()
+    {
+        // connect to proxy and send plain request to other host
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("GET http://127.0.0.1:2/pac HTTP/1.1\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 502 Bad Gateway\r\n", $response);
+        $this->assertContains("\r\n\r\nUnable to request:", $response);
+    }
+
+    public function testPacConnect()
+    {
+        // connect to proxy and send CONNECT request
+        $connector = new Connector($this->loop);
+
+        $uri = str_replace('tcp://', '', $this->proxy);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) use ($uri) {
+            $conn->write("CONNECT $uri HTTP/1.1\r\n\r\n");
+
+            $conn->once('data', function () use ($conn) {
+                $conn->write("GET /pac HTTP/1.1\r\n\r\n");
+            });
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.2);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("\r\n\r\nHTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("PROXY", $response);
     }
 }
