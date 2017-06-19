@@ -7,14 +7,13 @@ use React\HttpClient\Client as ReactHttpClient;
 use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
 use React\Socket\ServerInterface;
-use Psr\Http\Message\ResponseInterface;
-use React\Promise\Promise;
 
 class HttpProxyServer
 {
     private $connector;
     private $client;
     private $auth = null;
+    public $webProxy;
 
     public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, ReactHttpClient $client = null)
     {
@@ -26,6 +25,11 @@ class HttpProxyServer
         $this->client = new HttpClient($client);
 
         $that = $this;
+        $socket->on('connection', function (ConnectionInterface $connection) use ($that) {
+            $serverAddress = str_replace('tcp://', 'http://', $connection->getLocalAddress());
+            $that->webProxy = new WebProxy($this->client, $serverAddress);
+        });
+
         $server = new \React\Http\Server(array($this, 'handleRequest'));
         $server->listen($socket);
     }
@@ -43,6 +47,9 @@ class HttpProxyServer
 
         if ($direct && $request->getUri()->getPath() === '/pac') {
             return $this->handlePac($request);
+        }
+        if ($direct && $request->getUri()->getPath() === '/web') {
+            return $this->webProxy->handleRequest($request);
         }
 
         if ($this->auth !== null) {
@@ -105,16 +112,16 @@ class HttpProxyServer
     /** @internal */
     public function handlePlainRequest(ServerRequestInterface $request)
     {
-        $request= $request->withoutHeader('Host')
-            ->withoutHeader('Connection')
-            ->withoutHeader('Proxy-Authorization')
-            ->withoutHeader('Proxy-Connection');
+        $request = $request->withoutHeader('Host')
+                           ->withoutHeader('Connection')
+                           ->withoutHeader('Proxy-Authorization')
+                           ->withoutHeader('Proxy-Connection');
 
-        return $this->client->send($request)->then(null, function (\Exception $exception) {
+        return $this->client->send($request)->then(null, function (\Exception $e) {
             $message = '';
-            while ($exception !== null) {
-                $message .= $exception->getMessage() . "\n";
-                $exception = $exception->getPrevious();
+            while ($e !== null) {
+                $message .= $e->getMessage() . "\n";
+                $e = $e->getPrevious();
             }
 
             return new Response(

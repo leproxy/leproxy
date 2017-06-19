@@ -47,5 +47,12 @@ sleep 1
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8182 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8182 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
+# test webproxy
+
+out=$(curl -v --head --fail http://127.0.0.1:8180/web?url=httpbin.org%2Fredirect-to%3Furl%3Dhttp%253A%252F%252Fexample.com%252F 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --fail http://127.0.0.1:8180/web?url=http%3A%2F%2Fhttpbin.org%2Fredirect%2F6 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --fail http://127.0.0.1:8180/web?url=http%3A%2F%2Fhttpbin.org%2Fip 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --fail http://127.0.0.1:8180/web 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
 killall php 2>&- 1>&- || true
 echo DONE
