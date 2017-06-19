@@ -21,8 +21,9 @@
             "src/ConnectorFactory.php",
             "src/HttpProxyServer.php",
             "src/LeProxyServer.php",
+            "src/ProtocolDetector.php",
             "src/NullServer.php",
-            "src/ProtocolDetector.php"
+            "src/HttpClient.php"
         ]
     }
 }

@@ -3,12 +3,12 @@
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\LoopInterface;
 use React\Http\Response;
-use React\HttpClient\Client as HttpClient;
-use React\HttpClient\Response as ClientResponse;
-use React\Promise\Deferred;
+use React\HttpClient\Client as ReactHttpClient;
 use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
 use React\Socket\ServerInterface;
+use Psr\Http\Message\ResponseInterface;
+use React\Promise\Promise;
 
 class HttpProxyServer
 {
@@ -16,14 +16,14 @@ class HttpProxyServer
     private $client;
     private $auth = null;
 
-    public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
+    public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, ReactHttpClient $client = null)
     {
         if ($client === null) {
-            $client = new HttpClient($loop, $connector);
+            $client = new ReactHttpClient($loop, $connector);
         }
 
         $this->connector = $connector;
-        $this->client = $client;
+        $this->client = new HttpClient($client);
 
         $that = $this;
         $server = new \React\Http\Server(array($this, 'handleRequest'));
@@ -105,55 +105,25 @@ class HttpProxyServer
     /** @internal */
     public function handlePlainRequest(ServerRequestInterface $request)
     {
-        $incoming = $request->withoutHeader('Host')
-                            ->withoutHeader('Connection')
-                            ->withoutHeader('Proxy-Authorization')
-                            ->withoutHeader('Proxy-Connection');
+        $request= $request->withoutHeader('Host')
+            ->withoutHeader('Connection')
+            ->withoutHeader('Proxy-Authorization')
+            ->withoutHeader('Proxy-Connection');
 
-        $headers = array();
-        foreach ($incoming->getHeaders() as $name => $values) {
-            $headers[$name] = implode(', ', $values);
-        }
-
-        $outgoing = $this->client->request(
-            $incoming->getMethod(),
-            (string)$incoming->getUri(),
-            $headers,
-            $incoming->getProtocolVersion()
-        );
-
-        $deferred = new Deferred(function () use ($outgoing) {
-            $outgoing->close();
-            throw new \RuntimeException('Request cancelled');
-        });
-
-        $outgoing->on('response', function (ClientResponse $response) use ($deferred) {
-            $deferred->resolve(new Response(
-                $response->getCode(),
-                $response->getHeaders(),
-                $response,
-                $response->getVersion(),
-                $response->getReasonPhrase()
-            ));
-        });
-
-        $outgoing->on('error', function (Exception $e) use ($deferred) {
+        return $this->client->send($request)->then(null, function (\Exception $exception) {
             $message = '';
-            while ($e !== null) {
-                $message .= $e->getMessage() . "\n";
-                $e = $e->getPrevious();
+            while ($exception !== null) {
+                $message .= $exception->getMessage() . "\n";
+                $exception = $exception->getPrevious();
             }
 
-            $deferred->resolve(new Response(
+            return new Response(
                 502,
                 array('Content-Type' => 'text/plain'),
                 'Unable to request: ' . $message
-            ));
+            );
         });
 
-        $incoming->getBody()->pipe($outgoing);
-
-        return $deferred->promise();
     }
 
     /** @internal */
