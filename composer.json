@@ -16,9 +16,11 @@
     },
     "autoload": {
         "files": [
+            "src/ConnectorFactory.php",
             "src/HttpProxyServer.php",
-            "src/ProtocolDetector.php",
-            "src/NullServer.php"
+            "src/LeProxyServer.php",
+            "src/NullServer.php",
+            "src/ProtocolDetector.php"
         ]
     }
 }
