@@ -91,9 +91,6 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 
     public function testPlainOptions()
     {
-        $proxy = new LeProxyServer($this->loop);
-        $proxy->listen('127.0.0.1:8083');
-
         // connect to proxy and send absolute target URI
         $connector = new Connector($this->loop);
         $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
@@ -106,6 +103,22 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("\r\n\r\nOPTIONS / HTTP/1.1\r\n", $response);
+    }
+
+    public function testPlainOptionsWithoutPathUsesAsteriskForm()
+    {
+        // connect to proxy and send absolute target URI
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("OPTIONS http://127.0.0.1:8082 HTTP/1.1\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("\r\n\r\nOPTIONS * HTTP/1.1\r\n", $response);
     }
 
     public function testConnectGet()
