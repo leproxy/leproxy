@@ -167,10 +167,7 @@ class HttpProxyServer
         }
 
         // use proxy URI from current request (and make sure to include port even if default)
-        $uri = $request->getUri()->getHost() . ':' . $request->getUri()->getPort();
-        if (substr($uri, -1) === ':') {
-            $uri .= '80';
-        }
+        $uri = $request->getUri()->getHost() . ':' . ($request->getUri()->getPort() !== null ? $request->getUri()->getPort() : 80);
 
         return new Response(
             200,

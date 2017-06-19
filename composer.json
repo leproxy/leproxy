@@ -7,7 +7,9 @@
         "react/http-client": "^0.5"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8"
+        "clue/block-react": "^1.1",
+        "phpunit/phpunit": "^4.8",
+        "react/promise-stream": "^0.1.1"
     },
     "config": {
         "platform": {
@@ -16,9 +18,11 @@
     },
     "autoload": {
         "files": [
+            "src/ConnectorFactory.php",
             "src/HttpProxyServer.php",
-            "src/ProtocolDetector.php",
-            "src/NullServer.php"
+            "src/LeProxyServer.php",
+            "src/NullServer.php",
+            "src/ProtocolDetector.php"
         ]
     }
 }
