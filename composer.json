@@ -22,7 +22,9 @@
             "src/HttpProxyServer.php",
             "src/LeProxyServer.php",
             "src/NullServer.php",
-            "src/ProtocolDetector.php"
+            "src/ProtocolDetector.php",
+            "src/HttpClient.php",
+            "src/WebProxy.php"
         ]
     }
 }

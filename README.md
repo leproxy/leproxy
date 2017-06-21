@@ -154,6 +154,20 @@ http://127.0.0.1:1080/pac
   settings.
   If your client disallows this, simply remove or disable these settings again.
 
+## Web proxy
+
+Once LeProxy is running, you can use the internal web proxy by entering:
+`http://<address>:<port>/web`, so like in the examples before enter:
+`http://127.0.0.1:1080/web`
+
+The web proxy only excepts responses that or not bigger than 2MB. If you want
+to access bigger sites or download a file, you should consider to configure
+your [browser](#clients) to use LeProxy.
+
+> Note that the web proxy is currently under development and several features
+have to be implemented.
+Currently the following features are not supoorted: CSS(style, images etc.), cookies, srcset/images, meta tags(http-equiv) and HTTPS.
+
 ## License
 
 MIT-licensed

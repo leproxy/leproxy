@@ -245,4 +245,20 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $this->assertContains("\r\n\r\nHTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("PROXY", $response);
     }
+
+    public function testWeb()
+    {
+        // connect to proxy and send plain request to other host
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("GET http://127.0.0.1:8084/web HTTP/1.1\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("<form>", $response);
+    }
 }
