@@ -1,13 +1,23 @@
 <?php
 
+use Clue\Commander\Router;
+
 require __DIR__ . '/vendor/autoload.php';
 
-$listen = isset($argv[1]) ? $argv[1] : '127.0.0.1:1080';
-$path = isset($argv[2]) ? array_slice($argv, 2) : array();
+$listen = '127.0.0.1:1080';
+$path = array();
 
-// Alternatively, you can also hard-code these values like this:
-//$listen = '127.0.0.1:9050';
-//$path = array('127.0.0.1:9051', '127.0.0.1:9052', '127.0.0.1:9053');
+// parse options from command line arguments (argv)
+$commander = new Router();
+$commander->add('[<listen> [<forward>...]]', function ($args) use (&$listen, &$path) {
+    if (isset($args['listen'])) {
+        $listen = $args['listen'];
+    }
+    if (isset($args['forward'])) {
+        $path = $args['forward'];
+    }
+});
+$commander->execArgv();
 
 $loop = React\EventLoop\Factory::create();
 

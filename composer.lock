@@ -4,8 +4,58 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e09e980a25d1455a0fa21fa5d6941477",
+    "content-hash": "e857f6632c5b59e6905b6c53e5bd38ae",
     "packages": [
+        {
+            "name": "clue/commander",
+            "version": "v1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/php-commander.git",
+                "reference": "fba4e315360b87710efd15ba39ab6313ba9f0838"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/php-commander/zipball/fba4e315360b87710efd15ba39ab6313ba9f0838",
+                "reference": "fba4e315360b87710efd15ba39ab6313ba9f0838",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "clue/arguments": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Clue\\Commander\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@lueck.tv"
+                }
+            ],
+            "description": "Finally a sane way to register available commands and arguments and match your command line in PHP.",
+            "homepage": "https://github.com/clue/php-commander",
+            "keywords": [
+                "args",
+                "arguments",
+                "argv",
+                "command",
+                "command line",
+                "getopt",
+                "parse",
+                "router"
+            ],
+            "time": "2016-11-14T18:22:36+00:00"
+        },
         {
             "name": "clue/http-proxy-react",
             "version": "v1.1.0",
