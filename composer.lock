@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d62741bb3981aad9a2bc544f21a8316",
+    "content-hash": "9fe9dfdd5dabf249d83d22c0f95cea99",
     "packages": [
         {
             "name": "clue/commander",
@@ -56,6 +56,64 @@
                 "router"
             ],
             "time": "2017-06-29T20:17:23+00:00"
+        },
+        {
+            "name": "clue/connection-manager-extra",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/clue/php-connection-manager-extra.git",
+                "reference": "f35aefc1ef88c150c3fa544b772c5a75b0a1d700"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/clue/php-connection-manager-extra/zipball/f35aefc1ef88c150c3fa544b772c5a75b0a1d700",
+                "reference": "f35aefc1ef88c150c3fa544b772c5a75b0a1d700",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3.5",
+                "react/promise": "^2.1 || ^1.2.1",
+                "react/promise-timer": "^1.1",
+                "react/socket": "^1.0 || ^0.8 || ^0.7"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.0 || ^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ConnectionManager\\Extra\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Lück",
+                    "email": "christian@lueck.tv"
+                }
+            ],
+            "description": "Extra decorators for creating async TCP/IP connections, built on top of ReactPHP's Socket component",
+            "homepage": "https://github.com/clue/php-connection-manager-extra",
+            "keywords": [
+                "Connection",
+                "Socket",
+                "acl",
+                "delay",
+                "firewall",
+                "network",
+                "random",
+                "reactphp",
+                "reject",
+                "repeat",
+                "retry",
+                "timeout"
+            ],
+            "time": "2017-05-09T18:52:19+00:00"
         },
         {
             "name": "clue/http-proxy-react",

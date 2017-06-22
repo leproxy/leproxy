@@ -20,7 +20,7 @@ $commander->add('-h | --help', function () {
     exit('LeProxy HTTP/SOCKS proxy
 
 Usage:
-    $ php leproxy.php [<listenAddress> [<upstreamProxy>...]]
+    $ php leproxy.php [<listenAddress> [<upstreamProxy>...]] [--block=<destination>...]
     $ php leproxy.php --help
 
 Arguments:
@@ -37,6 +37,12 @@ Arguments:
         Each address consists of full URI which may contain a scheme, username
         and password, host and port. Default scheme is `http://`.
 
+    --block=<destination>
+        Blocks forwarding connections to the given destination address.
+        Any number of destination addresses can be given.
+        Each destination address can be in the form `host` or `host:port` and
+        `host` may contain the `*` wildcard to match anything.
+
     --help, -h
         shows this help and exits
 
@@ -50,12 +56,17 @@ Examples:
     $ php leproxy.php 127.0.0.1:1080 http://user:pass@127.1.1.1:1080
         Runs LeProxy locally without authentication and forwards all connection
         requests through an upstream proxy that requires authentication.
+
+    $ php leproxy.php --block=youtube.com --block=*:80
+        Runs LeProxy on default address and blocks access to youtube.com and
+        port 80 on all hosts (standard plaintext HTTP port).
 ');
 });
-$commander->add('[<listen> [<path>...]]', function ($args) {
+$commander->add('[--block=<host>...] [<listen> [<path>...]]', function ($args) {
     return $args + array(
         'listen' => '127.0.0.1:1080',
-        'path' => array()
+        'path' => array(),
+        'block' => array(),
     );
 });
 try {
@@ -71,6 +82,11 @@ $loop = Factory::create();
 
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain($args['path'], $loop);
+
+// block certain hosts if given
+if ($args['block']) {
+    $connector = ConnectorFactory::createBlockingConnector($args['block'], $connector);
+}
 
 // listen on 127.0.0.1:1080 or first argument
 $proxy = new LeProxyServer($loop, $connector);

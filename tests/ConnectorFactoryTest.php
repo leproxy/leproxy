@@ -60,4 +60,57 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
 
         ConnectorFactory::createConnectorChain(array('///'), $loop);
     }
+
+    public function testEmptyBlockPassesThrough()
+    {
+        $allow = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $allow->expects($this->once())->method('connect')->with('google.com:80');
+
+        $connector = ConnectorFactory::createBlockingConnector(array(), $allow);
+
+        $this->assertInstanceOf('React\Socket\ConnectorInterface', $connector);
+        $connector->connect('google.com:80');
+    }
+
+    public function testBlockDomains()
+    {
+        $allow = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $allow->expects($this->once())->method('connect')->with('github.com:443');
+
+        $connector = ConnectorFactory::createBlockingConnector(array('google.com', 'google.de'), $allow);
+
+        $this->assertInstanceOf('React\Socket\ConnectorInterface', $connector);
+
+        $this->assertPromiseRejected($connector->connect('google.com:80'));
+        $this->assertPromiseRejected($connector->connect('tcp://google.com:80'));
+        $this->assertPromiseRejected($connector->connect('tls://google.com:443'));
+
+        $connector->connect('github.com:443');
+    }
+
+    public function testBlockHttpPort()
+    {
+        $allow = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $allow->expects($this->once())->method('connect')->with('google.com:443');
+
+        $connector = ConnectorFactory::createBlockingConnector(array('*:80'), $allow);
+
+        $this->assertInstanceOf('React\Socket\ConnectorInterface', $connector);
+        $this->assertPromiseRejected($connector->connect('google.com:80'));
+        $this->assertPromiseRejected($connector->connect('tcp://github.com:80'));
+
+        $connector->connect('google.com:443');
+    }
+
+    private function assertPromiseRejected($input)
+    {
+        $this->assertInstanceOf('React\Promise\PromiseInterface', $input);
+
+        $rejected = false;
+        $input->then(null, function () use (&$rejected) {
+            $rejected= true;
+        });
+
+        $this->assertTrue($rejected);
+    }
 }
