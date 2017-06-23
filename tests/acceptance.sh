@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# test command line arguments
+out=$(php leproxy.php --help) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php leproxy.php -h) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php leproxy.php --unknown 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(php leproxy.php --unknown 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
 killall php 2>&- 1>&-s || true
 php leproxy.php 127.0.0.1:8180 &
 sleep 1
