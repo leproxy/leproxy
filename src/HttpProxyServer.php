@@ -1,5 +1,7 @@
 <?php
 
+namespace LeProxy\LeProxy;
+
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\LoopInterface;
 use React\Http\Response;
@@ -9,6 +11,7 @@ use React\Promise\Deferred;
 use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
 use React\Socket\ServerInterface;
+use Exception;
 
 class HttpProxyServer
 {

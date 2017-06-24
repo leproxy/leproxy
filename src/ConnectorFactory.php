@@ -1,5 +1,7 @@
 <?php
 
+namespace LeProxy\LeProxy;
+
 use Clue\React\HttpProxy\ProxyConnector as HttpClient;
 use Clue\React\Socks\Client as SocksClient;
 use React\EventLoop\LoopInterface;

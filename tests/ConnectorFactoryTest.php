@@ -1,5 +1,7 @@
 <?php
 
+use LeProxy\LeProxy\ConnectorFactory;
+
 class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
 {
     public function testEmptyChainReturnsConnector()
