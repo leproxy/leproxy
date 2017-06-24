@@ -37,6 +37,8 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://youtub
 out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 http://www.google.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://google.de 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 http://www.google.de 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://www.youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 https://www.youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://google.de 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 https://google.de 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1

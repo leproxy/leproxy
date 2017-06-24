@@ -72,7 +72,7 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
         $connector->connect('google.com:80');
     }
 
-    public function testBlockDomains()
+    public function testBlockDomainsBlocksOnlyDomainsAndSubDomains()
     {
         $allow = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
         $allow->expects($this->once())->method('connect')->with('tls://github.com:443');
@@ -85,7 +85,27 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertPromiseRejected($connector->connect('tcp://google.com:80'));
         $this->assertPromiseRejected($connector->connect('tls://google.com:443'));
 
+        $this->assertPromiseRejected($connector->connect('tcp://www.google.com:80'));
+        $this->assertPromiseRejected($connector->connect('tcp://some.sub.domain.google.de:80'));
+
         $connector->connect('tls://github.com:443');
+    }
+
+    public function testBlockWildcardBlocksOnlyMatchingDomains()
+    {
+        $allow = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $allow->expects($this->once())->method('connect')->with('tcp://google.com:80');
+
+        $connector = ConnectorFactory::createBlockingConnector(array('*.google.com'), $allow);
+
+        $this->assertInstanceOf('React\Socket\ConnectorInterface', $connector);
+
+        $this->assertPromiseRejected($connector->connect('test.google.com:80'));
+        $this->assertPromiseRejected($connector->connect('tcp://test.google.com:80'));
+        $this->assertPromiseRejected($connector->connect('tls://test.google.com:443'));
+        $this->assertPromiseRejected($connector->connect('tcp://some.sub.domain.google.com:80'));
+
+        $connector->connect('tcp://google.com:80');
     }
 
     public function testBlockHttpPort()

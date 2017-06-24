@@ -62,6 +62,11 @@ class ConnectorFactory
         $filter = array();
         foreach ($block as $host) {
             $filter[$host] = $reject;
+
+            // also reject all subdomains (*.domain), unless this already matches
+            if (substr($host, 0, 1) !== '*') {
+                $filter['*.' . $host] = $reject;
+            }
         }
 
         // this is a blacklist, so allow all other hosts by default

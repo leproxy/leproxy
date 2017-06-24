@@ -42,6 +42,7 @@ Arguments:
         Any number of destination addresses can be given.
         Each destination address can be in the form `host` or `host:port` and
         `host` may contain the `*` wildcard to match anything.
+        Subdomains for each host will automatically be blocked.
 
     --help, -h
         shows this help and exits
