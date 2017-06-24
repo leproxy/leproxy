@@ -18,12 +18,6 @@
         }
     },
     "autoload": {
-        "files": [
-            "src/ConnectorFactory.php",
-            "src/HttpProxyServer.php",
-            "src/LeProxyServer.php",
-            "src/NullServer.php",
-            "src/ProtocolDetector.php"
-        ]
+        "psr-4": { "LeProxy\\LeProxy\\": "src/"}
     }
 }
