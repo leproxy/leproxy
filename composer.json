@@ -1,4 +1,9 @@
 {
+    "name": "leproxy/leproxy",
+    "type": "project",
+    "description": "LeProxy is the HTTP/SOCKS proxy server for everybody!",
+    "keywords": ["LeProxy", "HTTP proxy", "SOCKS proxy", "HTTPS proxy", "proxy server", "async", "reactphp"],
+    "homepage": "http://leproxy.org/",
     "require": {
         "php": ">=5.4",
         "clue/commander": "^1.2",
