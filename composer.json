@@ -17,6 +17,9 @@
         "phpunit/phpunit": "^4.8",
         "react/promise-stream": "^0.1.1"
     },
+    "bin": [
+        "leproxy.php"
+    ],
     "config": {
         "platform": {
             "php": "5.4"
