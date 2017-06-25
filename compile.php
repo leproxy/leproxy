@@ -43,3 +43,18 @@ foreach ($files as $file) {
 $file = 'leproxy.php';
 system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') >> ' . escapeshellarg($out));
 echo ' DONE' . PHP_EOL;
+
+echo 'Optimizing resulting file...';
+$small = '';
+foreach (token_get_all(file_get_contents($out)) as $token) {
+    if (is_array($token) && ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT)) {
+        continue;
+    }
+    if (is_array($token) && $token[0] === T_WHITESPACE) {
+        $token = strpos($token[1], "\n") !== false ? "\n" : ' ';
+    }
+
+    $small .= isset($token[1]) ? $token[1] : $token;
+}
+file_put_contents($out, $small);
+echo ' DONE' . PHP_EOL;
