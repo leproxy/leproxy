@@ -91,6 +91,24 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $this->assertContains("Date: Tue, 27 Jun 2017 12:52:16 GMT", $response);
         $this->assertContains("X-Powered-By: React\r\n", $response);
         $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
+        $this->assertNotContains("User-Agent:", $response);
+    }
+
+    public function testPlainGetWithExplicitUserAgent()
+    {
+        // connect to proxy and send absolute target URI
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("GET http://127.0.0.1:8082/ HTTP/1.1\r\nUser-Agent: custom\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
+        $this->assertContains("User-Agent: custom\r\n", $response);
     }
 
     public function testPlainGetInvalidUriReturns502WithProxyResponseHeaders()
