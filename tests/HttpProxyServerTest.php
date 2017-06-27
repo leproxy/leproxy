@@ -64,6 +64,31 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(405, $response->getStatusCode());
     }
 
+    public function testPlainRequestForwardsWithExplicitHeadersAsGiven()
+    {
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
+        $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+
+        $outgoing = $this->getMockBuilder('React\HttpClient\Request')->disableOriginalConstructor()->getMock();
+
+        $client = $this->getMockBuilder('React\HttpClient\Client')->disableOriginalConstructor()->getMock();
+        $client->expects($this->once())
+            ->method('request')
+            ->with('GET', 'http://example.com/', array('Cookie' => array('name=value'), 'USER-AGENT' => array('TEST')))
+            ->willReturn($outgoing);
+
+        $server = new HttpProxyServer($loop, $socket, $connector, $client);
+
+        $request = new ServerRequest('GET', 'http://example.com/', array('Cookie' => 'name=value', 'USER-AGENT' => 'TEST'));
+        $request = $request->withRequestTarget((string)$request->getUri());
+        $request = $request->withBody(new HttpBodyStream(new ThroughStream(), null));
+
+        $promise = $server->handleRequest($request);
+
+        $this->assertInstanceOf('React\Promise\PromiseInterface', $promise);
+    }
+
     public function testPlainRequestWithValidAuthenticationForwardsViaHttpClientWithoutAuthorizationHeader()
     {
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
@@ -75,7 +100,7 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
         $client = $this->getMockBuilder('React\HttpClient\Client')->disableOriginalConstructor()->getMock();
         $client->expects($this->once())
                ->method('request')
-               ->with('GET', 'http://example.com/', array('Cookie' => 'name=value'))
+               ->with('GET', 'http://example.com/', array('Cookie' => array('name=value'), 'User-Agent' => array()))
                ->willReturn($outgoing);
 
         $server = new HttpProxyServer($loop, $socket, $connector, $client);

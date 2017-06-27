@@ -113,9 +113,9 @@ class HttpProxyServer
                             ->withoutHeader('Proxy-Authorization')
                             ->withoutHeader('Proxy-Connection');
 
-        $headers = array();
-        foreach ($incoming->getHeaders() as $name => $values) {
-            $headers[$name] = implode(', ', $values);
+        $headers = $incoming->getHeaders();
+        if (!$request->hasHeader('User-Agent')) {
+            $headers['User-Agent'] = array();
         }
 
         $outgoing = $this->client->request(

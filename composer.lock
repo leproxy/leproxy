@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e790f33991eacfabd2bf0bb1aed0047",
+    "content-hash": "948802631a030c6a679dbb5bad5e00e6",
     "packages": [
         {
             "name": "clue/commander",
@@ -493,16 +493,16 @@
         },
         {
             "name": "react/http-client",
-            "version": "v0.5.1",
+            "version": "v0.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http-client.git",
-                "reference": "9ef920e9e7dc86d340d30ffc63e1b9abd9bc302d"
+                "reference": "2a62a9cf1d1dde36ecc443a59e57c28afc79e713"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http-client/zipball/9ef920e9e7dc86d340d30ffc63e1b9abd9bc302d",
-                "reference": "9ef920e9e7dc86d340d30ffc63e1b9abd9bc302d",
+                "url": "https://api.github.com/repos/reactphp/http-client/zipball/2a62a9cf1d1dde36ecc443a59e57c28afc79e713",
+                "reference": "2a62a9cf1d1dde36ecc443a59e57c28afc79e713",
                 "shasum": ""
             },
             "require": {
@@ -531,7 +531,7 @@
             "keywords": [
                 "http"
             ],
-            "time": "2017-06-18T11:48:50+00:00"
+            "time": "2017-06-27T06:45:28+00:00"
         },
         {
             "name": "react/promise",
