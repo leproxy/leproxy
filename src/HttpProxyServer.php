@@ -16,6 +16,16 @@ class HttpProxyServer
     private $client;
     private $auth = null;
 
+    /**
+     * Default headers to include if this is an origin response (i.e. not a forwarded response)
+     *
+     * @var array
+     */
+    private $headers = array(
+        'Server' => 'LeProxy',
+        'X-Powered-By' => ''
+    );
+
     public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
     {
         if ($client === null) {
@@ -58,7 +68,10 @@ class HttpProxyServer
             if (!$auth || !isset($this->auth[$auth[0]]) || $this->auth[$auth[0]] !== $auth[1]) {
                 return new Response(
                     407,
-                    array('Proxy-Authenticate' => 'Basic realm="LeProxy HTTP/SOCKS proxy"', 'Content-Type' => 'text/plain'),
+                    array(
+                        'Proxy-Authenticate' => 'Basic realm="LeProxy HTTP/SOCKS proxy"',
+                        'Content-Type' => 'text/plain'
+                    ) + $this->headers,
                     'LeProxy HTTP/SOCKS proxy: Valid proxy authentication required'
                 );
             }
@@ -74,7 +87,10 @@ class HttpProxyServer
 
         return new Response(
             405,
-            array('Content-Type' => 'text/plain', 'Allow' => 'CONNECT'),
+            array(
+                'Content-Type' => 'text/plain',
+                'Allow' => 'CONNECT'
+            ) + $this->headers,
             'LeProxy HTTP/SOCKS proxy'
         );
     }
@@ -88,14 +104,16 @@ class HttpProxyServer
                 // connection established => forward data
                 return new Response(
                     200,
-                    array(),
+                    $this->headers,
                     $remote
                 );
             },
             function ($e) {
                 return new Response(
                     502,
-                    array('Content-Type' => 'text/plain'),
+                    array(
+                        'Content-Type' => 'text/plain'
+                    ) + $this->headers,
                     'Unable to connect: ' . $e->getMessage()
                 );
             }
@@ -128,13 +146,24 @@ class HttpProxyServer
         });
 
         $outgoing->on('response', function (ClientResponse $response) use ($deferred) {
-            $deferred->resolve(new Response(
+            $response = new Response(
                 $response->getCode(),
                 $response->getHeaders(),
                 $response,
                 $response->getVersion(),
                 $response->getReasonPhrase()
-            ));
+            );
+
+            // Ensure we do not pass any default header values in downstream
+            // response that are not present in upstream response by explicitly
+            // using empty header values which will be removed automatically.
+            foreach (array('X-Powered-By', 'Date') as $header) {
+                if (!$response->hasHeader($header)) {
+                    $response = $response->withHeader($header, '');
+                }
+            }
+
+            $deferred->resolve($response);
         });
 
         $outgoing->on('error', function (Exception $e) use ($deferred) {
@@ -146,7 +175,9 @@ class HttpProxyServer
 
             $deferred->resolve(new Response(
                 502,
-                array('Content-Type' => 'text/plain'),
+                array(
+                    'Content-Type' => 'text/plain'
+                ) + $this->headers,
                 'Unable to request: ' . $message
             ));
         });
@@ -162,7 +193,9 @@ class HttpProxyServer
         if ($request->getMethod() !== 'GET' && $request->getMethod() !== 'HEAD') {
             return new Response(
                 405,
-                array('Accept' => 'GET')
+                array(
+                    'Accept' => 'GET'
+                ) + $this->headers
             );
         }
 
@@ -171,7 +204,9 @@ class HttpProxyServer
 
         return new Response(
             200,
-            array('Content-Type' => 'application/x-ns-proxy-autoconfig'),
+            array(
+                'Content-Type' => 'application/x-ns-proxy-autoconfig',
+            ) + $this->headers,
             'function FindProxyForURL(url, host) { return "PROXY ' . $uri . '"; }' . PHP_EOL
         );
     }

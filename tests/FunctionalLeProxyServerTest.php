@@ -18,6 +18,8 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
     private $socketOrigin;
     private $proxy;
 
+    private $headers = array();
+
     public function setUp()
     {
         $this->loop = Factory::create();
@@ -25,7 +27,14 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $this->socketOrigin = new Socket(8082, $this->loop);
 
         $origin = new Server(function (ServerRequestInterface $request) {
-            return new Response(200, array(), Psr7\str($request));
+            return new Response(
+                200,
+                $this->headers + array(
+                    'X-Powered-By' => '',
+                    'Date' => '',
+                ),
+                Psr7\str($request)
+            );
         });
         $origin->listen($this->socketOrigin);
 
@@ -41,7 +50,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $this->socketProxy->close();
     }
 
-    public function testPlainGet()
+    public function testPlainGetReturnsUpstreamResponseHeaders()
     {
         // connect to proxy and send absolute target URI
         $connector = new Connector($this->loop);
@@ -54,10 +63,36 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $response = Block\await($promise, $this->loop, 0.1);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertNotContains("Server:", $response);
+        $this->assertNotContains("Date:", $response);
         $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
     }
 
-    public function testPlainGetInvalidUriReturns502()
+    public function testPlainGetReturnsUpstreamResponseHeadersCustom()
+    {
+        $this->headers = array(
+            'Server' => 'React',
+            'Date' => 'Tue, 27 Jun 2017 12:52:16 GMT',
+            'X-Powered-By' => 'React'
+        );
+        // connect to proxy and send absolute target URI
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("GET http://127.0.0.1:8082/ HTTP/1.1\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("Server: React\r\n", $response);
+        $this->assertContains("Date: Tue, 27 Jun 2017 12:52:16 GMT", $response);
+        $this->assertContains("X-Powered-By: React\r\n", $response);
+        $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
+    }
+
+    public function testPlainGetInvalidUriReturns502WithProxyResponseHeaders()
     {
         // connect to proxy and send absolute target URI
         $connector = new Connector($this->loop);
@@ -70,6 +105,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $response = Block\await($promise, $this->loop, 0.1);
 
         $this->assertStringStartsWith("HTTP/1.1 502 Bad Gateway\r\n", $response);
+        $this->assertContains("Server: LeProxy\r\n", $response);
         $this->assertContains("\r\n\r\nUnable to request:", $response);
     }
 
@@ -86,6 +122,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $response = Block\await($promise, $this->loop, 0.1);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertNotContains("Server:", $response);
         $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
     }
 
@@ -102,6 +139,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $response = Block\await($promise, $this->loop, 0.1);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertNotContains("Server:", $response);
         $this->assertContains("\r\n\r\nOPTIONS / HTTP/1.1\r\n", $response);
     }
 
@@ -118,6 +156,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $response = Block\await($promise, $this->loop, 0.1);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertNotContains("Server:", $response);
         $this->assertContains("\r\n\r\nOPTIONS * HTTP/1.1\r\n", $response);
     }
 
@@ -138,6 +177,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $response = Block\await($promise, $this->loop, 0.2);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("Server: LeProxy\r\n", $response);
         $this->assertContains("\r\n\r\nHTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
     }
@@ -155,6 +195,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $response = Block\await($promise, $this->loop, 0.1);
 
         $this->assertStringStartsWith("HTTP/1.1 502 Bad Gateway\r\n", $response);
+        $this->assertContains("Server: LeProxy\r\n", $response);
         $this->assertContains("\r\n\r\nUnable to connect:", $response);
     }
 
@@ -171,6 +212,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $response = Block\await($promise, $this->loop, 0.1);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("Server: LeProxy\r\n", $response);
         $this->assertContains("PROXY", $response);
     }
 
