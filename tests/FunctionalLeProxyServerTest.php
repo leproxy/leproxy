@@ -1,5 +1,6 @@
 <?php
 
+use LeProxy\LeProxy\LeProxyServer;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Server;
 use React\Socket\Server as Socket;

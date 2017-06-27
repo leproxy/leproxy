@@ -1,7 +1,10 @@
 <?php
 
-use React\Socket\ServerInterface;
+namespace LeProxy\LeProxy;
+
 use React\Socket\ConnectionInterface;
+use React\Socket\ServerInterface;
+use Exception;
 
 /**
  * Detects HTTP and SOCKS protocol unification on a single listening socket

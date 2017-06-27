@@ -1,7 +1,11 @@
+#!/usr/bin/env php
 <?php
+
+namespace LeProxy\LeProxy;
 
 use Clue\Commander\Router;
 use Clue\Commander\NoRouteFoundException;
+use React\EventLoop\Factory;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -58,7 +62,7 @@ try {
     exit(64);
 }
 
-$loop = React\EventLoop\Factory::create();
+$loop = Factory::create();
 
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain($args['path'], $loop);

@@ -1,5 +1,6 @@
 <?php
 
+use LeProxy\LeProxy\LeProxyServer;
 use React\EventLoop\Factory;
 
 class LeProxyServerTest extends PHPUnit_Framework_TestCase

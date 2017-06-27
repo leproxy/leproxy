@@ -1,10 +1,13 @@
 <?php
 
+namespace LeProxy\LeProxy;
+
 use Clue\React\Socks\Server as SocksServer;
 use React\EventLoop\LoopInterface;
 use React\Socket\Connector;
 use React\Socket\ConnectorInterface;
 use React\Socket\Server as Socket;
+use InvalidArgumentException;
 
 /**
  * Integrates HTTP and SOCKS proxy servers into a single server instance
@@ -39,7 +42,7 @@ class LeProxyServer
 
         $parts = parse_url($listen);
         if (!$parts || !isset($parts['scheme'], $parts['host'], $parts['port'])) {
-            throw new \InvalidArgumentException('Invalid URI for listening address');
+            throw new InvalidArgumentException('Invalid URI for listening address');
         }
 
         $socket = new Socket($parts['host'] . ':' . $parts['port'], $this->loop);

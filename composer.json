@@ -1,4 +1,9 @@
 {
+    "name": "leproxy/leproxy",
+    "type": "project",
+    "description": "LeProxy is the HTTP/SOCKS proxy server for everybody!",
+    "keywords": ["LeProxy", "HTTP proxy", "SOCKS proxy", "HTTPS proxy", "proxy server", "async", "reactphp"],
+    "homepage": "http://leproxy.org/",
     "require": {
         "php": ">=5.4",
         "clue/commander": "^1.2",
@@ -12,18 +17,15 @@
         "phpunit/phpunit": "^4.8",
         "react/promise-stream": "^0.1.1"
     },
+    "bin": [
+        "leproxy.php"
+    ],
     "config": {
         "platform": {
             "php": "5.4"
         }
     },
     "autoload": {
-        "files": [
-            "src/ConnectorFactory.php",
-            "src/HttpProxyServer.php",
-            "src/LeProxyServer.php",
-            "src/NullServer.php",
-            "src/ProtocolDetector.php"
-        ]
+        "psr-4": { "LeProxy\\LeProxy\\": "src/"}
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use LeProxy\LeProxy\HttpProxyServer;
 use React\Http\ServerRequest;
 use React\Http\HttpBodyStream;
 use React\Stream\ThroughStream;

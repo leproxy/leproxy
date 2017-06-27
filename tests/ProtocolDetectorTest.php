@@ -1,5 +1,6 @@
 <?php
 
+use LeProxy\LeProxy\ProtocolDetector;
 use React\Socket\Server;
 use React\Socket\ConnectionInterface;
 

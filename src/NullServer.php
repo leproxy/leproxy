@@ -1,5 +1,7 @@
 <?php
 
+namespace LeProxy\LeProxy;
+
 use Evenement\EventEmitter;
 use React\Socket\ServerInterface;
 
