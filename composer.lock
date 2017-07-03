@@ -4,27 +4,28 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "948802631a030c6a679dbb5bad5e00e6",
+    "content-hash": "cf39b3cd0296a0904b87756fd5438faf",
     "packages": [
         {
             "name": "clue/commander",
-            "version": "v1.2.1",
+            "version": "v1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-commander.git",
-                "reference": "fba4e315360b87710efd15ba39ab6313ba9f0838"
+                "reference": "b19c3b5099fa765f03aa049851f3ea35df2b5807"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-commander/zipball/fba4e315360b87710efd15ba39ab6313ba9f0838",
-                "reference": "fba4e315360b87710efd15ba39ab6313ba9f0838",
+                "url": "https://api.github.com/repos/clue/php-commander/zipball/b19c3b5099fa765f03aa049851f3ea35df2b5807",
+                "reference": "b19c3b5099fa765f03aa049851f3ea35df2b5807",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3"
             },
             "require-dev": {
-                "clue/arguments": "^1.0"
+                "clue/arguments": "^1.0",
+                "phpunit/phpunit": "^5.0 || ^4.8"
             },
             "type": "library",
             "autoload": {
@@ -54,7 +55,7 @@
                 "parse",
                 "router"
             ],
-            "time": "2016-11-14T18:22:36+00:00"
+            "time": "2017-06-29T20:17:23+00:00"
         },
         {
             "name": "clue/http-proxy-react",
