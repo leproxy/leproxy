@@ -42,6 +42,7 @@ foreach ($files as $file) {
 
 $file = 'leproxy.php';
 system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') >> ' . escapeshellarg($out));
+chmod($out, 0755);
 echo ' DONE' . PHP_EOL;
 
 echo 'Optimizing resulting file...';
