@@ -1,6 +1,7 @@
 <?php
 
-$out = 'leproxy.out.php';
+// use first argument as output file or use "leproxy-{version}.php"
+$out = isset($argv[1]) ? $argv[1] : ('leproxy-' . exec('git describe --always --dirty || echo dev') . '.php');
 
 system('composer install --no-dev --classmap-authoritative');
 $classes = require __DIR__ . '/vendor/composer/autoload_classmap.php';

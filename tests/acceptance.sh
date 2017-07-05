@@ -1,6 +1,7 @@
 #!/bin/bash
 
-bin=$(test -f leproxy.out.php && echo leproxy.out.php || echo leproxy.php)
+# test against first argument or search first file matching "leproxy*.php"
+bin=${1:-$(ls -b leproxy*.php | head -n1 || echo leproxy.php)}
 echo "Testing $bin"
 
 # test command line arguments
