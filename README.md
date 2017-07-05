@@ -25,7 +25,7 @@ LeProxy requires only PHP.
 HHVM.
 
 If you're already familiar with [Composer](http://getcomposer.org), here's the
-quick install quide.
+quick install guide.
 Simply download LeProxy and run:
 
 ```bash
@@ -156,4 +156,4 @@ http://127.0.0.1:1080/pac
 
 ## License
 
-MIT-licensed
+Released under the permissive [MIT license](LICENSE).
