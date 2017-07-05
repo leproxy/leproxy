@@ -7,6 +7,11 @@ use Clue\Commander\Router;
 use Clue\Commander\NoRouteFoundException;
 use React\EventLoop\Factory;
 
+if (PHP_VERSION_ID < 50400 || PHP_SAPI !== 'cli') {
+    echo 'LeProxy HTTP/SOCKS proxy requires running ' . (PHP_SAPI !== 'cli' ? ('via command line (not ' . PHP_SAPI . ')') : (' on PHP 5.4+ (is ' . PHP_VERSION . ')')) . PHP_EOL;
+    exit(1);
+}
+
 require __DIR__ . '/vendor/autoload.php';
 
 // parse options from command line arguments (argv)
