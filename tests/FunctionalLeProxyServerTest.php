@@ -306,4 +306,21 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $this->assertContains("\r\n\r\nHTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("PROXY", $response);
     }
+
+    public function testDirectInvalid()
+    {
+        // connect to proxy and send direct request
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("GET /pac HTTP\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 400 Bad Request\r\n", $response);
+        //$this->assertContains("Server: LeProxy\r\n", $response);
+        //$this->assertNotContains('X-Powered-By', $response);
+    }
 }
