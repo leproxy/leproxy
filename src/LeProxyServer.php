@@ -60,6 +60,10 @@ class LeProxyServer
 
             $http->setAuthArray($auth);
             $socks->setAuthArray($auth);
+
+            if ($this->connector instanceof LoggingConnector) {
+                $this->connector->setAuth($auth);
+            }
         }
 
         return $socket;

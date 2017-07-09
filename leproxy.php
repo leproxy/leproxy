@@ -6,6 +6,7 @@ namespace LeProxy\LeProxy;
 use Clue\Commander\Router;
 use Clue\Commander\NoRouteFoundException;
 use React\EventLoop\Factory;
+use React\Stream\WritableResourceStream;
 
 if (PHP_VERSION_ID < 50400 || PHP_SAPI !== 'cli') {
     echo 'LeProxy HTTP/SOCKS proxy requires running ' . (PHP_SAPI !== 'cli' ? ('via command line (not ' . PHP_SAPI . ')') : (' on PHP 5.4+ (is ' . PHP_VERSION . ')')) . PHP_EOL;
@@ -40,6 +41,9 @@ Arguments:
     --help, -h
         shows this help and exits
 
+    --log, l
+        shows live log on the console, not persistent
+
 Examples:
     $ php leproxy.php
         Runs LeProxy on default address 127.0.0.1:1080 (local only)
@@ -52,12 +56,20 @@ Examples:
         requests through an upstream proxy that requires authentication.
 ');
 });
-$commander->add('[<listen> [<path>...]]', function ($args) {
+$commander->add('[-l | --log] [<listen> [<path>...]]', function ($args) {
+    $activeLog = false;
+    if (array_key_exists('log', $args) || array_key_exists('l', $args)) {
+        $activeLog = true;
+    }
+    $args['log'] = $activeLog;
+
+
     return $args + array(
         'listen' => '127.0.0.1:1080',
-        'path' => array()
+        'path' => array(),
     );
 });
+
 try {
     $args = $commander->handleArgv();
 } catch (NoRouteFoundException $e) {
@@ -71,6 +83,9 @@ $loop = Factory::create();
 
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain($args['path'], $loop);
+if ($args['log']) {
+    $connector = new LoggingConnector($connector, new WritableResourceStream(STDOUT, $loop));
+}
 
 // listen on 127.0.0.1:1080 or first argument
 $proxy = new LeProxyServer($loop, $connector);
