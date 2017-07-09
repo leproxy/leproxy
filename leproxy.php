@@ -20,7 +20,7 @@ $commander->add('-h | --help', function () {
     exit('LeProxy HTTP/SOCKS proxy
 
 Usage:
-    $ php leproxy.php [<listenAddress> [<upstreamProxy>...]]
+    $ php leproxy.php [<listenAddress>] [--forward=<upstreamProxy>...]
     $ php leproxy.php --help
 
 Arguments:
@@ -30,7 +30,7 @@ Arguments:
         password, host and port.
         By default, LeProxy will listen on the address 127.0.0.1:1080.
 
-    <upstreamProxy>
+    --forward=<upstreamProxy>
         An upstream proxy servers where each connection request will be
         forwarded to (proxy chaining).
         Any number of upstream proxies can be given.
@@ -47,15 +47,15 @@ Examples:
     $ php leproxy.php user:pass@0.0.0.0:1080
         Runs LeProxy on all addresses (public) and require authentication
 
-    $ php leproxy.php 127.0.0.1:1080 http://user:pass@127.1.1.1:1080
-        Runs LeProxy locally without authentication and forwards all connection
-        requests through an upstream proxy that requires authentication.
+    $ php leproxy.php --forward=http://user:pass@127.1.1.1:1080
+        Runs LeProxy so that all connection requests will be forwarded through
+        an upstream proxy server that requires authentication.
 ');
 });
-$commander->add('[<listen> [<path>...]]', function ($args) {
+$commander->add('[--forward=<upstreamProxy>...] [<listen>]', function ($args) {
     return $args + array(
         'listen' => '127.0.0.1:1080',
-        'path' => array()
+        'forward' => array()
     );
 });
 try {
@@ -70,7 +70,7 @@ try {
 $loop = Factory::create();
 
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
-$connector = ConnectorFactory::createConnectorChain($args['path'], $loop);
+$connector = ConnectorFactory::createConnectorChain($args['forward'], $loop);
 
 // listen on 127.0.0.1:1080 or first argument
 $proxy = new LeProxyServer($loop, $connector);
@@ -79,8 +79,8 @@ $socket = $proxy->listen($args['listen']);
 $addr = str_replace('tcp://', 'http://', $socket->getAddress());
 echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . PHP_EOL;
 
-if ($args['path']) {
-    echo 'Forwarding via: ' . implode(' -> ', $args['path']) . PHP_EOL;
+if ($args['forward']) {
+    echo 'Forwarding via: ' . implode(' -> ', $args['forward']) . PHP_EOL;
 }
 
 $loop->run();
