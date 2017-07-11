@@ -153,6 +153,10 @@ http://127.0.0.1:1080/pac
   establish further connections, as most clients will simply ignore invalid
   settings.
   If your client disallows this, simply remove or disable these settings again.
+  LeProxy's PAC file instructs your client to use LeProxy as an HTTP proxy for
+  all public HTTP requests.
+  This means that hostnames that resolve to IPs from your local network will
+  still use a direct connection without going through a proxy.
 
 ## License
 
