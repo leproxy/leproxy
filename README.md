@@ -92,7 +92,7 @@ You can simply pass your upstream proxy server address as another URL parameter
 after the listening address like this:
 
 ```bash
-$ php leproxy.php --forward=socks://user:pass@127.0.0.1:8080
+$ php leproxy.php --proxy=socks://user:pass@127.0.0.1:8080
 ```
 
 > The upstream proxy server URI MUST contain a hostname or IP and SHOULD include
@@ -112,7 +112,7 @@ communication partners and the destination only sees the last proxy server in
 the chain:
 
 ```bash
-$ php leproxy.php --forward=127.1.1.1:1080 --forward=127.2.2.2:1080 --forward=127.3.3.3:1080
+$ php leproxy.php --proxy=127.1.1.1:1080 --proxy=127.2.2.2:1080 --proxy=127.3.3.3:1080
 ```
 
 ## Clients
