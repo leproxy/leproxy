@@ -59,12 +59,14 @@ $commander->add('[--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
         foreach ($args['proxy'] as &$uri) {
             $uri = ConnectorFactory::coerceProxyUri($uri);
         }
+    } else {
+        $args['proxy'] = array();
     }
 
-    return $args + array(
-        'listen' => '127.0.0.1:1080',
-        'proxy' => array()
-    );
+    // validate listening URI or assume default URI
+    $args['listen'] = ConnectorFactory::coerceListenUri(isset($args['listen']) ? $args['listen'] : '127.0.0.1:1080');
+
+    return $args;
 });
 try {
     $args = $commander->handleArgv();
@@ -87,7 +89,14 @@ $connector = ConnectorFactory::createConnectorChain($args['proxy'], $loop);
 
 // listen on 127.0.0.1:1080 or first argument
 $proxy = new LeProxyServer($loop, $connector);
-$socket = $proxy->listen($args['listen']);
+try {
+    $socket = $proxy->listen($args['listen']);
+} catch (\RuntimeException $e) {
+    fwrite(STDERR, 'Program error: Unable to start listening, maybe try another port? (' . $e->getMessage() . ')'. PHP_EOL);
+
+    // sysexits.h: #define EX_OSERR 71 /* system error (e.g., can't fork) */
+    exit(71);
+}
 
 $addr = str_replace('tcp://', 'http://', $socket->getAddress());
 echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . PHP_EOL;

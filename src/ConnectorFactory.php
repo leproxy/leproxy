@@ -57,6 +57,28 @@ class ConnectorFactory
 
         return $parts['scheme'] . '://' . $parts['host'] . ':' . $parts['port'];
     }
+
+    /**
+     * Parses the given listening URI and adds default scheme and port or throws on error
+     *
+     * @param string $uri
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function coerceListenUri($uri)
+    {
+        $parts = parse_url('http://' . $uri);
+        if (!$parts || !isset($parts['scheme'], $parts['host'], $parts['port']) || isset($parts['path']) || isset($parts['query']) || isset($parts['fragment'])) {
+            throw new \InvalidArgumentException('Listening URI "' . $uri . '" can not be parsed as a valid URI');
+        }
+
+        if (false === filter_var(trim($parts['host'], '[]'), FILTER_VALIDATE_IP)) {
+            throw new \InvalidArgumentException('Listening URI "' . $uri . '" must contain a valid IP, not a hostname');
+        }
+
+        return $uri;
+    }
+
     /**
      * Creates a new connector for the given proxy chain (list of proxy servers)
      *

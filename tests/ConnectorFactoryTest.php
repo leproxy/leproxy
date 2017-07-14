@@ -42,6 +42,44 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testCoerceListenUri()
+    {
+        $uris = array(
+            '127.0.0.1:1234' => '127.0.0.1:1234',
+            'user:pass@0.0.0.0:8080' => 'user:pass@0.0.0.0:8080',
+        );
+
+        foreach ($uris as $in => $out) {
+            $this->assertEquals($out, ConnectorFactory::coerceListenUri($in));
+        }
+    }
+
+    public function testCoerceListenUriInvalidThrows()
+    {
+        $uris = array(
+            'empty' => '',
+            'no port' => '127.0.0.1',
+            'invalid port' => '127.0.0.1:port',
+            'null port' => '127.0.0.1:0',
+            'only port' => ':8080',
+            'hostname' => 'localhost:8080',
+            'wildcard hostname' => '*:8080',
+            'excessive scheme' => 'http://127.0.0.1:8080',
+            'excessive path' => '127.0.0.1:8080/root',
+            'excessive query' => '127.0.0.1:8080?query',
+            'excessive fragment' => '127.0.0.1:8080#fragment',
+        );
+
+        foreach ($uris as $uri) {
+            try {
+                ConnectorFactory::coerceListenUri($uri);
+                $this->fail();
+            } catch (InvalidArgumentException $e) {
+                $this->assertTrue(true);
+            }
+        }
+    }
+
     public function testEmptyChainReturnsConnector()
     {
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();

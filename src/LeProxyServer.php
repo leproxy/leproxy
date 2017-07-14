@@ -34,13 +34,7 @@ class LeProxyServer
      */
     public function listen($listen)
     {
-        // prepend default scheme
-        $pos = strpos($listen, '://');
-        if ($pos === false) {
-            $listen = 'http://' . $listen;
-        }
-
-        $parts = parse_url($listen);
+        $parts = parse_url('http://' . $listen);
         if (!$parts || !isset($parts['scheme'], $parts['host'], $parts['port'])) {
             throw new InvalidArgumentException('Invalid URI for listening address');
         }
