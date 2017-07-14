@@ -56,14 +56,14 @@ Once [installed](#install), you can start LeProxy by simply running:
 $ php leproxy.php 
 ```
 
-By default, LeProxy will listen on the address `127.0.0.1:1080`. 
+By default, LeProxy will listen on the address `127.0.0.1:8080`. 
 If you want to listen on another address, you can pass an explicit listening
 address.
 For example, if you want to listen on all interfaces and allow access to LeProxy
 from the outside:
 
 ```bash
-$ php leproxy.php 0.0.0.0:1080
+$ php leproxy.php 0.0.0.0:8080
 ```
 
 Note that LeProxy does not require authentication by default,
@@ -72,7 +72,7 @@ If you want to require the client to send username/password authentication
 details, you can include this as part of the listening address:
 
 ```bash
-$ php leproxy.php username:password@0.0.0.0:1080
+$ php leproxy.php username:password@0.0.0.0:8080
 ```
 
 > If the username or password contains special characters, make sure to use
@@ -111,7 +111,7 @@ communication partners and the destination only sees the last proxy server in
 the chain:
 
 ```bash
-$ php leproxy.php --proxy=127.1.1.1:1080 --proxy=127.2.2.2:1080 --proxy=127.3.3.3:1080
+$ php leproxy.php --proxy=127.1.1.1:8080 --proxy=127.2.2.2:8080 --proxy=127.3.3.3:8080
 ```
 
 ## Clients
@@ -128,7 +128,7 @@ You can simply set the details from the listening address as configured above:
 
 * Protocol: HTTP or SOCKS
 * Server: 127.0.0.1
-* Port: 1080
+* Port: 8080
 
 > Note that these settings have to be adjusted to your actual network settings.
   If you fail to provide correct settings, no further connection will succeed.
@@ -144,7 +144,7 @@ another network or the proxy server is temporarily not available.
 Simply use the URL to your LeProxy instance in the following format:
 
 ```
-http://127.0.0.1:1080/pac
+http://127.0.0.1:8080/pac
 ```
 
 > Note that these settings have to be adjusted to your actual network settings.

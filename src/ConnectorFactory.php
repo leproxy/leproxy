@@ -68,12 +68,17 @@ class ConnectorFactory
     public static function coerceListenUri($uri)
     {
         $parts = parse_url('http://' . $uri);
-        if (!$parts || !isset($parts['scheme'], $parts['host'], $parts['port']) || isset($parts['path']) || isset($parts['query']) || isset($parts['fragment'])) {
+        if (!$parts || !isset($parts['scheme'], $parts['host']) || isset($parts['path']) || isset($parts['query']) || isset($parts['fragment'])) {
             throw new \InvalidArgumentException('Listening URI "' . $uri . '" can not be parsed as a valid URI');
         }
 
         if (false === filter_var(trim($parts['host'], '[]'), FILTER_VALIDATE_IP)) {
             throw new \InvalidArgumentException('Listening URI "' . $uri . '" must contain a valid IP, not a hostname');
+        }
+
+        // always assume default port 8080
+        if (!isset($parts['port'])) {
+            $uri .= ':8080';
         }
 
         return $uri;

@@ -46,6 +46,7 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
     {
         $uris = array(
             '127.0.0.1:1234' => '127.0.0.1:1234',
+            '127.0.0.1' => '127.0.0.1:8080',
             'user:pass@0.0.0.0:8080' => 'user:pass@0.0.0.0:8080',
         );
 
@@ -58,7 +59,6 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
     {
         $uris = array(
             'empty' => '',
-            'no port' => '127.0.0.1',
             'invalid port' => '127.0.0.1:port',
             'null port' => '127.0.0.1:0',
             'only port' => ':8080',
