@@ -31,11 +31,12 @@ Arguments:
         By default, LeProxy will listen on the address 127.0.0.1:1080.
 
     --proxy=<upstreamProxy>
-        An upstream proxy servers where each connection request will be
+        An upstream proxy server where each connection request will be
         forwarded to (proxy chaining).
         Any number of upstream proxies can be given.
         Each address consists of full URI which may contain a scheme, username
-        and password, host and port. Default scheme is `http://`.
+        and password, host and port. Default scheme is `http://`, default port
+        is `8080` for all schemes.
 
     --help, -h
         shows this help and exits
@@ -53,6 +54,13 @@ Examples:
 ');
 });
 $commander->add('[--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
+    // validate all upstream proxy URIs if given
+    if (isset($args['proxy'])) {
+        foreach ($args['proxy'] as &$uri) {
+            $uri = ConnectorFactory::coerceProxyUri($uri);
+        }
+    }
+
     return $args + array(
         'listen' => '127.0.0.1:1080',
         'proxy' => array()
@@ -60,8 +68,13 @@ $commander->add('[--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
 });
 try {
     $args = $commander->handleArgv();
-} catch (NoRouteFoundException $e) {
-    fwrite(STDERR, 'Usage Error: Invalid command arguments given, see --help' . PHP_EOL);
+} catch (\Exception $e) {
+    $message = '';
+    if (!$e instanceof NoRouteFoundException) {
+        $message = ' (' . $e->getMessage() . ')';
+    }
+
+    fwrite(STDERR, 'Usage Error: Invalid command arguments given, see --help' . $message . PHP_EOL);
 
     // sysexits.h: #define EX_USAGE 64 /* command line usage error */
     exit(64);
