@@ -67,8 +67,11 @@ class ConnectorFactory
      */
     public static function coerceListenUri($uri)
     {
-        // null port means random port assignment and needs to be parsed separately
+        // apply default host if omitted for `:port` or `user@:port`
         $original = $uri;
+        $uri = preg_replace('/(^|@)(:\d+)$/', '${1}127.0.0.1${2}', $uri);
+
+        // null port means random port assignment and needs to be parsed separately
         $nullport = false;
         if (substr($uri, -2) === ':0') {
             $nullport = true;
@@ -84,13 +87,11 @@ class ConnectorFactory
             throw new \InvalidArgumentException('Listening URI "' . $original . '" must contain a valid IP, not a hostname');
         }
 
-        // null port returns original URI unmodified
         if ($nullport) {
-            return $original;
-        }
-
-        // always assume default port 8080
-        if (!isset($parts['port'])) {
+            // null port returns original URI unmodified
+            $uri .= ':0';
+        } elseif (!isset($parts['port'])) {
+            // always assume default port 8080
             $uri .= ':8080';
         }
 

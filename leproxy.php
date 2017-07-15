@@ -47,6 +47,9 @@ Examples:
     $ php leproxy.php
         Runs LeProxy on default address 127.0.0.1:8080 (local only)
 
+    $ php leproy.php :1080
+        Runs LeProxy on custom address 127.0.0.1:1080 (local only)
+
     $ php leproxy.php user:pass@0.0.0.0:8080
         Runs LeProxy on all addresses (public) and require authentication
 

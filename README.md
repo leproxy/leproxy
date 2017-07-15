@@ -68,6 +68,9 @@ from the outside:
 $ php leproxy.php 0.0.0.0:8080
 ```
 
+> The listening address MUST be in the form `ip:port` or just `ip` or `:port`,
+  with the above defaults being applied.
+
 Note that LeProxy does not require authentication by default,
 so the above should be used with care.
 If you want to require the client to send username/password authentication
