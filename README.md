@@ -59,6 +59,8 @@ $ php leproxy.php
 By default, LeProxy will listen on the address `127.0.0.1:8080`. 
 If you want to listen on another address, you can pass an explicit listening
 address.
+LeProxy will report an error if it fails to listen on the given address,
+you may try another address or use port `0` to pick a random free port.
 For example, if you want to listen on all interfaces and allow access to LeProxy
 from the outside:
 

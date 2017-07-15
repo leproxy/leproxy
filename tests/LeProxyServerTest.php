@@ -26,4 +26,20 @@ class LeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $loop->run();
     }
+
+    public function testProxyDoesCreateSocketWithRandomPortForNullPort()
+    {
+        $loop = Factory::create();
+
+        $proxy = new LeProxyServer($loop);
+
+        $socket = $proxy->listen('user:pass@127.0.0.1:0');
+
+        $addr = $socket->getAddress();
+
+        $this->assertStringStartsNotWith('127.0.0.1:', $addr);
+        $this->assertStringEndsNotWith(':0', $addr);
+
+        $socket->close();
+    }
 }

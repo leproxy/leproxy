@@ -29,6 +29,8 @@ Arguments:
         The address consists of a full URI which may contain a username and
         password, host and port.
         By default, LeProxy will listen on the address 127.0.0.1:8080.
+        LeProxy will report an error if it fails to listen on the given address,
+        you may try another address or use port `0` to pick a random free port.
 
     --proxy=<upstreamProxy>
         An upstream proxy server where each connection request will be

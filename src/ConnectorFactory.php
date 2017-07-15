@@ -67,13 +67,26 @@ class ConnectorFactory
      */
     public static function coerceListenUri($uri)
     {
+        // null port means random port assignment and needs to be parsed separately
+        $original = $uri;
+        $nullport = false;
+        if (substr($uri, -2) === ':0') {
+            $nullport = true;
+            $uri = (string)substr($uri, 0, -2);
+        }
+
         $parts = parse_url('http://' . $uri);
         if (!$parts || !isset($parts['scheme'], $parts['host']) || isset($parts['path']) || isset($parts['query']) || isset($parts['fragment'])) {
-            throw new \InvalidArgumentException('Listening URI "' . $uri . '" can not be parsed as a valid URI');
+            throw new \InvalidArgumentException('Listening URI "' . $original . '" can not be parsed as a valid URI');
         }
 
         if (false === filter_var(trim($parts['host'], '[]'), FILTER_VALIDATE_IP)) {
-            throw new \InvalidArgumentException('Listening URI "' . $uri . '" must contain a valid IP, not a hostname');
+            throw new \InvalidArgumentException('Listening URI "' . $original . '" must contain a valid IP, not a hostname');
+        }
+
+        // null port returns original URI unmodified
+        if ($nullport) {
+            return $original;
         }
 
         // always assume default port 8080
