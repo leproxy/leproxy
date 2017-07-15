@@ -45,6 +45,7 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
     public function testCoerceListenUri()
     {
         $uris = array(
+            '' => '127.0.0.1:8080',
             '127.0.0.1:1234' => '127.0.0.1:1234',
             '127.0.0.1' => '127.0.0.1:8080',
             '127.0.0.1:0' => '127.0.0.1:0',
@@ -54,6 +55,9 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
             'user:pass@127.0.0.1' => 'user:pass@127.0.0.1:8080',
             'user:pass@:1234' => 'user:pass@127.0.0.1:1234',
             '12:34@:45' => '12:34@127.0.0.1:45',
+            'user:pass@' => 'user:pass@127.0.0.1:8080',
+            '[::1]' => '[::1]:8080',
+            'user:pass@[::1]' => 'user:pass@[::1]:8080'
         );
 
         foreach ($uris as $in => $out) {
@@ -64,7 +68,6 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
     public function testCoerceListenUriInvalidThrows()
     {
         $uris = array(
-            'empty' => '',
             'invalid port' => '127.0.0.1:port',
             'hostname' => 'localhost:8080',
             'wildcard hostname' => '*:8080',

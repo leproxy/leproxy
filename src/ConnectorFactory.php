@@ -69,7 +69,7 @@ class ConnectorFactory
     {
         // apply default host if omitted for `:port` or `user@:port`
         $original = $uri;
-        $uri = preg_replace('/(^|@)(:\d+)$/', '${1}127.0.0.1${2}', $uri);
+        $uri = preg_replace('/(^|@)(:\d+)?$/', '${1}127.0.0.1${2}', $uri);
 
         // null port means random port assignment and needs to be parsed separately
         $nullport = false;
