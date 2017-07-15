@@ -28,7 +28,7 @@ Arguments:
         The socket address to listen on.
         The address consists of a full URI which may contain a username and
         password, host and port.
-        By default, LeProxy will listen on the address 127.0.0.1:8080.
+        By default, LeProxy will listen on the public address 0.0.0.0:8080.
         LeProxy will report an error if it fails to listen on the given address,
         you may try another address or use port `0` to pick a random free port.
 
@@ -45,13 +45,13 @@ Arguments:
 
 Examples:
     $ php leproxy.php
-        Runs LeProxy on default address 127.0.0.1:8080 (local only)
+        Runs LeProxy on public default address 0.0.0.0:8080
 
-    $ php leproy.php :1080
+    $ php leproy.php 127.0.0.1:1080
         Runs LeProxy on custom address 127.0.0.1:1080 (local only)
 
     $ php leproxy.php user:pass@0.0.0.0:8080
-        Runs LeProxy on all addresses (public) and require authentication
+        Runs LeProxy on public default addresses and require authentication
 
     $ php leproxy.php --proxy=http://user:pass@127.1.1.1:8080
         Runs LeProxy so that all connection requests will be forwarded through
@@ -69,7 +69,7 @@ $commander->add('[--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
     }
 
     // validate listening URI or assume default URI
-    $args['listen'] = ConnectorFactory::coerceListenUri(isset($args['listen']) ? $args['listen'] : '127.0.0.1');
+    $args['listen'] = ConnectorFactory::coerceListenUri(isset($args['listen']) ? $args['listen'] : '');
 
     return $args;
 });

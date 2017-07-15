@@ -56,23 +56,23 @@ Once [installed](#install), you can start LeProxy by simply running:
 $ php leproxy.php 
 ```
 
-By default, LeProxy will listen on the address `127.0.0.1:8080`. 
+By default, LeProxy will listen on the public address `0.0.0.0:8080`. 
 If you want to listen on another address, you can pass an explicit listening
 address.
 LeProxy will report an error if it fails to listen on the given address,
 you may try another address or use port `0` to pick a random free port.
-For example, if you want to listen on all interfaces and allow access to LeProxy
-from the outside:
+For example, if you do not want to allow accessing LeProxy from the outside and
+only want to listen on the local interface:
 
 ```bash
-$ php leproxy.php 0.0.0.0:8080
+$ php leproxy.php 127.0.0.1:8080
 ```
 
 > The listening address MUST be in the form `ip:port` or just `ip` or `:port`,
   with the above defaults being applied.
 
 Note that LeProxy does not require authentication by default,
-so the above should be used with care.
+so the above default should be used with care.
 If you want to require the client to send username/password authentication
 details, you can include this as part of the listening address:
 
@@ -132,7 +132,7 @@ settings/preferences dialogs.
 You can simply set the details from the listening address as configured above:
 
 * Protocol: HTTP or SOCKS
-* Server: 127.0.0.1
+* Server: 127.0.0.1 (or the public hostname or IP where LeProxy runs)
 * Port: 8080
 
 > Note that these settings have to be adjusted to your actual network settings.
