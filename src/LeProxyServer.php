@@ -47,7 +47,7 @@ class LeProxyServer
 
         $socket = new Socket($parts['host'] . ':' . $parts['port'], $this->loop);
 
-        // start new proxy server which uses the above connector for forwarding
+        // start new proxy server which uses the given connector for forwarding/chaining
         $unification = new ProtocolDetector($socket);
         $http = new HttpProxyServer($this->loop, $unification->http, $this->connector);
         $socks = new SocksServer($this->loop, $unification->socks, $this->connector);

@@ -92,14 +92,13 @@ You can simply pass your upstream proxy server address as another URL parameter
 after the listening address like this:
 
 ```bash
-$ php leproxy.php 0.0.0.0:1080 socks://user:pass@127.0.0.1:8080
+$ php leproxy.php --proxy=socks://user:pass@127.0.0.1:8080
 ```
 
 > The upstream proxy server URI MUST contain a hostname or IP and SHOULD include
-  a port unless it is the standard port for this proxy scheme.
+  a port unless the proxy happens to use default port `8080`.
   If no scheme is given, the `http://` scheme will be assumed.
-  The `http://` scheme uses default port 80, all `socks[5|4|4a]://` schemes
-  default to port 1080.
+  If no port is given, port `8080` will be assumed regardless of scheme.
   The `http://` and `socks[5]://` schemes support optional username/password
   authentication as in the above example.
 
@@ -112,7 +111,7 @@ communication partners and the destination only sees the last proxy server in
 the chain:
 
 ```bash
-$ php leproxy.php 0.0.0.0:1080 127.1.1.1:1080 127.2.2.2:1080 127.3.3.3:1080
+$ php leproxy.php --proxy=127.1.1.1:1080 --proxy=127.2.2.2:1080 --proxy=127.3.3.3:1080
 ```
 
 ## Clients
