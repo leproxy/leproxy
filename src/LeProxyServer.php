@@ -8,6 +8,7 @@ use React\Socket\Connector;
 use React\Socket\ConnectorInterface;
 use React\Socket\Server as Socket;
 use InvalidArgumentException;
+use React\Socket\ConnectionInterface;
 
 /**
  * Integrates HTTP and SOCKS proxy servers into a single server instance
@@ -64,6 +65,22 @@ class LeProxyServer
 
             $http->setAuthArray($auth);
             $socks->setAuthArray($auth);
+        } else {
+            // no authentication required, so only allow local requests (protected mode)
+            // this works by setting authentication on a per-connection basis
+            $socks->on('connection', function (ConnectionInterface $conn) use ($socks) {
+                $remote = parse_url($conn->getRemoteAddress(), PHP_URL_HOST);
+                if ($remote === null || ConnectorFactory::isIpLocal(trim($remote, '[]'))) {
+                    // do not require authentication for local requests
+                    $socks->unsetAuth();
+                } else {
+                    // enforce authentication, but always fail for non-local requests
+                    // this implies that SOCKS4 will be rejected right away
+                    $socks->setAuth(function () {
+                        return false;
+                    });
+                }
+            });
         }
 
         return $socket;

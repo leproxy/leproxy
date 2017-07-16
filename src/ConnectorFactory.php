@@ -99,6 +99,20 @@ class ConnectorFactory
     }
 
     /**
+     * Checks whether the given IP is a localhost/loopback IP
+     *
+     * Matches 127.0.0.0/8, equivalent IPv4-mapped IPv6-address and
+     * IPv6 loopback address.
+     *
+     * @param string $ip
+     * @return boolean
+     */
+    public static function isIpLocal($ip)
+    {
+        return (strpos($ip, '127.') === 0 || strpos($ip, '::ffff:127.') === 0 || $ip === '::1');
+    }
+
+    /**
      * Creates a new connector for the given proxy chain (list of proxy servers)
      *
      * The proxy chain may contain any number of proxy server URIs.

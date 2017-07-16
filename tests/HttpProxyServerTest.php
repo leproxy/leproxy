@@ -64,6 +64,36 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(405, $response->getStatusCode());
     }
 
+    public function testRequestUnprotectedLocalhostReturnsSuccess()
+    {
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
+        $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+
+        $server = new HttpProxyServer($loop, $socket, $connector);
+
+        $request = new ServerRequest('GET', '/', array(), null, '1.1', array('REMOTE_ADDR' => '127.0.0.1'));
+
+        $response = $server->handleRequest($request);
+
+        $this->assertEquals(405, $response->getStatusCode());
+    }
+
+    public function testRequestUnprotectedRemoteReturnsForbidden()
+    {
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
+        $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+
+        $server = new HttpProxyServer($loop, $socket, $connector);
+
+        $request = new ServerRequest('GET', '/', array(), null, '1.1', array('REMOTE_ADDR' => '192.168.1.1'));
+
+        $response = $server->handleRequest($request);
+
+        $this->assertEquals(403, $response->getStatusCode());
+    }
+
     public function testPlainRequestForwardsWithExplicitHeadersAsGiven()
     {
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();

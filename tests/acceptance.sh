@@ -11,7 +11,7 @@ out=$(php leproxy.php --proxy= 2>&1 || true) && echo "$out" | grep -q "see --hel
 out=$(php leproxy.php --proxy=tcp://host/ 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
 killall php 2>&- 1>&-s || true
-php leproxy.php :8180 &
+php leproxy.php 127.0.0.1:8180 &
 sleep 2
 
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
@@ -27,6 +27,17 @@ out=$(curl -v --head --silent --fail --proxy socks5://user:pass@127.0.0.1:8180 h
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://test.invalid/test 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://test.invalid/test 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8180 http://test.invalid/test 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+
+# restart LeProxy on IPv6 address
+killall php 2>&- 1>&-s || true
+php leproxy.php [::]:8180 &
+sleep 2
+
+out=$(curl -v --head --silent --fail --proxy http://[::1]:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy socks://[::1]:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
 
 # restart LeProxy with authentication required
 killall php 2>&- 1>&-s || true

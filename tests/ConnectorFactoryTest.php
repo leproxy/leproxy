@@ -87,6 +87,24 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testIsIpLocal()
+    {
+        $ips = array(
+            '127.0.0.1' => true,
+            '127.1.2.3' => true,
+            '192.168.1.1' => false,
+            '8.8.8.8' => false,
+
+            '::ffff:127.0.0.1' => true,
+            '::1' => true,
+            '::2' => false
+        );
+
+        foreach ($ips as $ip => $bool) {
+            $this->assertEquals($bool, ConnectorFactory::isIpLocal($ip));
+        }
+    }
+
     public function testEmptyChainReturnsConnector()
     {
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();

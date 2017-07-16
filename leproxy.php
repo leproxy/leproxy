@@ -31,6 +31,8 @@ Arguments:
         By default, LeProxy will listen on the public address 0.0.0.0:8080.
         LeProxy will report an error if it fails to listen on the given address,
         you may try another address or use port `0` to pick a random free port.
+        If this address does not contain a username and password, LeProxy will
+        run in protected mode and only forward requests from the local host.
 
     --proxy=<upstreamProxy>
         An upstream proxy server where each connection request will be
@@ -45,10 +47,10 @@ Arguments:
 
 Examples:
     $ php leproxy.php
-        Runs LeProxy on public default address 0.0.0.0:8080
+        Runs LeProxy on public default address 0.0.0.0:8080 (protected mode)
 
     $ php leproy.php 127.0.0.1:1080
-        Runs LeProxy on custom address 127.0.0.1:1080 (local only)
+        Runs LeProxy on custom address 127.0.0.1:1080 (protected mode, local only)
 
     $ php leproxy.php user:pass@0.0.0.0:8080
         Runs LeProxy on public default addresses and require authentication
@@ -104,7 +106,8 @@ try {
 }
 
 $addr = str_replace('tcp://', 'http://', $socket->getAddress());
-echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . PHP_EOL;
+echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr;
+echo ' (' . (strpos($args['listen'], '@') !== false ? 'authentication required' : 'protected mode, local access only') . ')' . PHP_EOL;
 
 if ($args['proxy']) {
     echo 'Forwarding via: ' . implode(' -> ', $args['proxy']) . PHP_EOL;
