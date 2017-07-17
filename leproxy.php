@@ -28,7 +28,9 @@ Arguments:
         The socket address to listen on.
         The address consists of a full URI which may contain a username and
         password, host and port.
-        By default, LeProxy will listen on the address 127.0.0.1:1080.
+        By default, LeProxy will listen on the address 127.0.0.1:8080.
+        LeProxy will report an error if it fails to listen on the given address,
+        you may try another address or use port `0` to pick a random free port.
 
     --proxy=<upstreamProxy>
         An upstream proxy server where each connection request will be
@@ -43,12 +45,15 @@ Arguments:
 
 Examples:
     $ php leproxy.php
-        Runs LeProxy on default address 127.0.0.1:1080 (local only)
+        Runs LeProxy on default address 127.0.0.1:8080 (local only)
 
-    $ php leproxy.php user:pass@0.0.0.0:1080
+    $ php leproy.php :1080
+        Runs LeProxy on custom address 127.0.0.1:1080 (local only)
+
+    $ php leproxy.php user:pass@0.0.0.0:8080
         Runs LeProxy on all addresses (public) and require authentication
 
-    $ php leproxy.php --proxy=http://user:pass@127.1.1.1:1080
+    $ php leproxy.php --proxy=http://user:pass@127.1.1.1:8080
         Runs LeProxy so that all connection requests will be forwarded through
         an upstream proxy server that requires authentication.
 ');
@@ -59,12 +64,14 @@ $commander->add('[--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
         foreach ($args['proxy'] as &$uri) {
             $uri = ConnectorFactory::coerceProxyUri($uri);
         }
+    } else {
+        $args['proxy'] = array();
     }
 
-    return $args + array(
-        'listen' => '127.0.0.1:1080',
-        'proxy' => array()
-    );
+    // validate listening URI or assume default URI
+    $args['listen'] = ConnectorFactory::coerceListenUri(isset($args['listen']) ? $args['listen'] : '127.0.0.1');
+
+    return $args;
 });
 try {
     $args = $commander->handleArgv();
@@ -85,9 +92,16 @@ $loop = Factory::create();
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain($args['proxy'], $loop);
 
-// listen on 127.0.0.1:1080 or first argument
+// create proxy server and start listening on given address
 $proxy = new LeProxyServer($loop, $connector);
-$socket = $proxy->listen($args['listen']);
+try {
+    $socket = $proxy->listen($args['listen']);
+} catch (\RuntimeException $e) {
+    fwrite(STDERR, 'Program error: Unable to start listening, maybe try another port? (' . $e->getMessage() . ')'. PHP_EOL);
+
+    // sysexits.h: #define EX_OSERR 71 /* system error (e.g., can't fork) */
+    exit(71);
+}
 
 $addr = str_replace('tcp://', 'http://', $socket->getAddress());
 echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . PHP_EOL;

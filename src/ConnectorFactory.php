@@ -57,6 +57,47 @@ class ConnectorFactory
 
         return $parts['scheme'] . '://' . $parts['host'] . ':' . $parts['port'];
     }
+
+    /**
+     * Parses the given listening URI and adds default scheme and port or throws on error
+     *
+     * @param string $uri
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function coerceListenUri($uri)
+    {
+        // apply default host if omitted for `:port` or `user@:port`
+        $original = $uri;
+        $uri = preg_replace('/(^|@)(:\d+)?$/', '${1}127.0.0.1${2}', $uri);
+
+        // null port means random port assignment and needs to be parsed separately
+        $nullport = false;
+        if (substr($uri, -2) === ':0') {
+            $nullport = true;
+            $uri = (string)substr($uri, 0, -2);
+        }
+
+        $parts = parse_url('http://' . $uri);
+        if (!$parts || !isset($parts['scheme'], $parts['host']) || isset($parts['path']) || isset($parts['query']) || isset($parts['fragment'])) {
+            throw new \InvalidArgumentException('Listening URI "' . $original . '" can not be parsed as a valid URI');
+        }
+
+        if (false === filter_var(trim($parts['host'], '[]'), FILTER_VALIDATE_IP)) {
+            throw new \InvalidArgumentException('Listening URI "' . $original . '" must contain a valid IP, not a hostname');
+        }
+
+        if ($nullport) {
+            // null port returns original URI unmodified
+            $uri .= ':0';
+        } elseif (!isset($parts['port'])) {
+            // always assume default port 8080
+            $uri .= ':8080';
+        }
+
+        return $uri;
+    }
+
     /**
      * Creates a new connector for the given proxy chain (list of proxy servers)
      *
