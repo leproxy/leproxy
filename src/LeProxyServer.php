@@ -30,10 +30,11 @@ class LeProxyServer
 
     /**
      * @param string $listen
+     * @param bool   $allowUnprotected
      * @return \React\Socket\ServerInterface
      * @throws \InvalidArgumentException
      */
-    public function listen($listen)
+    public function listen($listen, $allowUnprotected)
     {
         $nullport = false;
         if (substr($listen, -2) === ':0') {
@@ -65,9 +66,11 @@ class LeProxyServer
 
             $http->setAuthArray($auth);
             $socks->setAuthArray($auth);
-        } else {
+        } elseif (!$allowUnprotected) {
             // no authentication required, so only allow local requests (protected mode)
-            // this works by setting authentication on a per-connection basis
+            $http->allowUnprotected = false;
+
+            // SOCKS works by setting authentication on a per-connection basis
             $socks->on('connection', function (ConnectionInterface $conn) use ($socks) {
                 $remote = parse_url($conn->getRemoteAddress(), PHP_URL_HOST);
                 if ($remote === null || ConnectorFactory::isIpLocal(trim($remote, '[]'))) {

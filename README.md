@@ -73,6 +73,8 @@ $ php leproxy.php 127.0.0.1:8080
 
 Note that LeProxy runs in protected mode by default, so that it only forwards
 requests from the local host and can not be abused as an open proxy.
+If you have ensured only legit users can access your system, you can
+pass the `--allow-unprotected` flag to forward requests from all hosts.
 If you want to require the client to send username/password authentication
 details, you can include this as part of the listening address:
 

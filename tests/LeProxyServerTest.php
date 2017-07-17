@@ -12,7 +12,7 @@ class LeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $proxy = new LeProxyServer($loop);
 
-        $proxy->listen('///');
+        $proxy->listen('///', false);
     }
 
     public function testProxyDoesNotBlockTheLoopIfSocketIsClosed()
@@ -21,7 +21,7 @@ class LeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $proxy = new LeProxyServer($loop);
 
-        $socket = $proxy->listen('user:pass@127.0.0.1:8180');
+        $socket = $proxy->listen('user:pass@127.0.0.1:8180', false);
         $socket->close();
 
         $loop->run();
@@ -33,7 +33,7 @@ class LeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $proxy = new LeProxyServer($loop);
 
-        $socket = $proxy->listen('user:pass@127.0.0.1:0');
+        $socket = $proxy->listen('user:pass@127.0.0.1:0', false);
 
         $addr = $socket->getAddress();
 

@@ -40,7 +40,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $origin->listen($this->socketOrigin);
 
         $proxy = new LeProxyServer($this->loop);
-        $this->socketProxy = $proxy->listen('127.0.0.1:8084');
+        $this->socketProxy = $proxy->listen('127.0.0.1:8084', false);
 
         $this->proxy = $this->socketProxy->getAddress();
     }
