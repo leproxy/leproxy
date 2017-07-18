@@ -20,7 +20,7 @@ $commander->add('-h | --help', function () {
     exit('LeProxy HTTP/SOCKS proxy
 
 Usage:
-    $ php leproxy.php [<listenAddress>] [--proxy=<upstreamProxy>...]
+    $ php leproxy.php [<listenAddress>] [--allow-unprotected] [--proxy=<upstreamProxy>...]
     $ php leproxy.php --help
 
 Arguments:
@@ -28,9 +28,20 @@ Arguments:
         The socket address to listen on.
         The address consists of a full URI which may contain a username and
         password, host and port.
-        By default, LeProxy will listen on the address 127.0.0.1:8080.
+        By default, LeProxy will listen on the public address 0.0.0.0:8080.
         LeProxy will report an error if it fails to listen on the given address,
         you may try another address or use port `0` to pick a random free port.
+        If this address does not contain a username and password, LeProxy will
+        run in protected mode and only forward requests from the local host,
+        see also `--allow-unprotected`.
+
+    --allow-unprotected
+        If no username and password has been given, then LeProxy runs in
+        protected mode by default, so that it only forwards requests from the
+        local host and can not be abused as an open proxy.
+        If you have ensured only legit users can access your system, you can
+        pass the `--allow-unprotected` flag to forward requests from all hosts.
+        This option should be used with care, you have been warned.
 
     --proxy=<upstreamProxy>
         An upstream proxy server where each connection request will be
@@ -45,20 +56,20 @@ Arguments:
 
 Examples:
     $ php leproxy.php
-        Runs LeProxy on default address 127.0.0.1:8080 (local only)
+        Runs LeProxy on public default address 0.0.0.0:8080 (protected mode)
 
-    $ php leproy.php :1080
-        Runs LeProxy on custom address 127.0.0.1:1080 (local only)
+    $ php leproy.php 127.0.0.1:1080
+        Runs LeProxy on custom address 127.0.0.1:1080 (protected mode, local only)
 
     $ php leproxy.php user:pass@0.0.0.0:8080
-        Runs LeProxy on all addresses (public) and require authentication
+        Runs LeProxy on public default addresses and require authentication
 
     $ php leproxy.php --proxy=http://user:pass@127.1.1.1:8080
         Runs LeProxy so that all connection requests will be forwarded through
         an upstream proxy server that requires authentication.
 ');
 });
-$commander->add('[--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
+$commander->add('[--allow-unprotected] [--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
     // validate all upstream proxy URIs if given
     if (isset($args['proxy'])) {
         foreach ($args['proxy'] as &$uri) {
@@ -69,7 +80,12 @@ $commander->add('[--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
     }
 
     // validate listening URI or assume default URI
-    $args['listen'] = ConnectorFactory::coerceListenUri(isset($args['listen']) ? $args['listen'] : '127.0.0.1');
+    $args['listen'] = ConnectorFactory::coerceListenUri(isset($args['listen']) ? $args['listen'] : '');
+
+    $args['allow-unprotected'] = isset($args['allow-unprotected']);
+    if ($args['allow-unprotected'] && strpos($args['listen'], '@') !== false) {
+        throw new \InvalidArgumentException('Unprotected mode can not be used with authentication required');
+    }
 
     return $args;
 });
@@ -95,7 +111,7 @@ $connector = ConnectorFactory::createConnectorChain($args['proxy'], $loop);
 // create proxy server and start listening on given address
 $proxy = new LeProxyServer($loop, $connector);
 try {
-    $socket = $proxy->listen($args['listen']);
+    $socket = $proxy->listen($args['listen'], $args['allow-unprotected']);
 } catch (\RuntimeException $e) {
     fwrite(STDERR, 'Program error: Unable to start listening, maybe try another port? (' . $e->getMessage() . ')'. PHP_EOL);
 
@@ -104,7 +120,15 @@ try {
 }
 
 $addr = str_replace('tcp://', 'http://', $socket->getAddress());
-echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . PHP_EOL;
+echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . ' (';
+if (strpos($args['listen'], '@') !== false) {
+    echo 'authentication required';
+} elseif ($args['allow-unprotected']) {
+    echo 'unprotected mode, open proxy';
+} else {
+    echo 'protected mode, local access only';
+}
+echo ')' . PHP_EOL;
 
 if ($args['proxy']) {
     echo 'Forwarding via: ' . implode(' -> ', $args['proxy']) . PHP_EOL;

@@ -29,6 +29,13 @@ class HttpProxyServer
         'X-Powered-By' => ''
     );
 
+    /**
+     * Whether to allow unprotected access from outside or only allow local access
+     *
+     * @var bool
+     */
+    public $allowUnprotected = true;
+
     public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
     {
         if ($client === null) {
@@ -68,6 +75,7 @@ class HttpProxyServer
                 }
             }
 
+            // reject invalid authentication
             if (!$auth || !isset($this->auth[$auth[0]]) || $this->auth[$auth[0]] !== $auth[1]) {
                 return new Response(
                     407,
@@ -76,6 +84,18 @@ class HttpProxyServer
                         'Content-Type' => 'text/plain'
                     ) + $this->headers,
                     'LeProxy HTTP/SOCKS proxy: Valid proxy authentication required'
+                );
+            }
+        } elseif (!$this->allowUnprotected) {
+            // reject requests not coming from 127.0.0.1/8 or IPv6 equivalent (protected mode)
+            $params = $request->getServerParams();
+            if (isset($params['REMOTE_ADDR']) && !ConnectorFactory::isIpLocal(trim($params['REMOTE_ADDR'], '[]'))) {
+                return new Response(
+                    403,
+                    array(
+                        'Content-Type' => 'text/plain'
+                    ) + $this->headers,
+                    'LeProxy HTTP/SOCKS proxy is running in protected mode and allows local access only'
                 );
             }
         }

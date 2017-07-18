@@ -45,17 +45,17 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
     public function testCoerceListenUri()
     {
         $uris = array(
-            '' => '127.0.0.1:8080',
+            '' => '0.0.0.0:8080',
             '127.0.0.1:1234' => '127.0.0.1:1234',
             '127.0.0.1' => '127.0.0.1:8080',
             '127.0.0.1:0' => '127.0.0.1:0',
-            ':1234' => '127.0.0.1:1234',
-            ':0' => '127.0.0.1:0',
+            ':1234' => '0.0.0.0:1234',
+            ':0' => '0.0.0.0:0',
             'user:pass@0.0.0.0:8080' => 'user:pass@0.0.0.0:8080',
             'user:pass@127.0.0.1' => 'user:pass@127.0.0.1:8080',
-            'user:pass@:1234' => 'user:pass@127.0.0.1:1234',
-            '12:34@:45' => '12:34@127.0.0.1:45',
-            'user:pass@' => 'user:pass@127.0.0.1:8080',
+            'user:pass@:1234' => 'user:pass@0.0.0.0:1234',
+            '12:34@:45' => '12:34@0.0.0.0:45',
+            'user:pass@' => 'user:pass@0.0.0.0:8080',
             '[::1]' => '[::1]:8080',
             'user:pass@[::1]' => 'user:pass@[::1]:8080'
         );
@@ -84,6 +84,24 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
             } catch (InvalidArgumentException $e) {
                 $this->assertTrue(true);
             }
+        }
+    }
+
+    public function testIsIpLocal()
+    {
+        $ips = array(
+            '127.0.0.1' => true,
+            '127.1.2.3' => true,
+            '192.168.1.1' => false,
+            '8.8.8.8' => false,
+
+            '::ffff:127.0.0.1' => true,
+            '::1' => true,
+            '::2' => false
+        );
+
+        foreach ($ips as $ip => $bool) {
+            $this->assertEquals($bool, ConnectorFactory::isIpLocal($ip));
         }
     }
 

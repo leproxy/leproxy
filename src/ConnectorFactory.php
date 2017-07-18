@@ -69,7 +69,7 @@ class ConnectorFactory
     {
         // apply default host if omitted for `:port` or `user@:port`
         $original = $uri;
-        $uri = preg_replace('/(^|@)(:\d+)?$/', '${1}127.0.0.1${2}', $uri);
+        $uri = preg_replace('/(^|@)(:\d+)?$/', '${1}0.0.0.0${2}', $uri);
 
         // null port means random port assignment and needs to be parsed separately
         $nullport = false;
@@ -96,6 +96,20 @@ class ConnectorFactory
         }
 
         return $uri;
+    }
+
+    /**
+     * Checks whether the given IP is a localhost/loopback IP
+     *
+     * Matches 127.0.0.0/8, equivalent IPv4-mapped IPv6-address and
+     * IPv6 loopback address.
+     *
+     * @param string $ip
+     * @return boolean
+     */
+    public static function isIpLocal($ip)
+    {
+        return (strpos($ip, '127.') === 0 || strpos($ip, '::ffff:127.') === 0 || $ip === '::1');
     }
 
     /**
