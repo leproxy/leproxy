@@ -8,19 +8,25 @@ use Clue\Commander\NoRouteFoundException;
 use React\EventLoop\Factory;
 
 if (PHP_VERSION_ID < 50400 || PHP_SAPI !== 'cli') {
-    echo 'LeProxy HTTP/SOCKS proxy requires running ' . (PHP_SAPI !== 'cli' ? ('via command line (not ' . PHP_SAPI . ')') : (' on PHP 5.4+ (is ' . PHP_VERSION . ')')) . PHP_EOL;
+    echo 'LeProxy HTTP/SOCKS proxy requires running ' . (PHP_SAPI !== 'cli' ? ('via command line (not ' . PHP_SAPI . ')') : ('on PHP 5.4+ (is ' . PHP_VERSION . ')')) . PHP_EOL;
     exit(1);
 }
+
+define('VERSION', exec('git describe --always --dirty 2>/dev/null || echo unknown'));
 
 require __DIR__ . '/vendor/autoload.php';
 
 // parse options from command line arguments (argv)
 $commander = new Router();
+$commander->add('--version', function () {
+    exit('LeProxy development version ' . VERSION . PHP_EOL);
+});
 $commander->add('-h | --help', function () {
     exit('LeProxy HTTP/SOCKS proxy
 
 Usage:
     $ php leproxy.php [<listenAddress>] [--allow-unprotected] [--proxy=<upstreamProxy>...]
+    $ php leproxy.php --version
     $ php leproxy.php --help
 
 Arguments:
@@ -51,8 +57,11 @@ Arguments:
         and password, host and port. Default scheme is `http://`, default port
         is `8080` for all schemes.
 
+    --version
+        Prints the current version of LeProxy and exits.
+
     --help, -h
-        shows this help and exits
+        Shows this help and exits.
 
 Examples:
     $ php leproxy.php

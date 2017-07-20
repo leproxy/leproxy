@@ -42,7 +42,7 @@ foreach ($files as $file) {
 }
 
 $file = 'leproxy.php';
-system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') >> ' . escapeshellarg($out));
+system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') | sed -e "s/development/release/" >> ' . escapeshellarg($out));
 chmod($out, 0755);
 echo ' DONE (' . filesize($out) . ' bytes)' . PHP_EOL;
 
