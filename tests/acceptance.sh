@@ -1,18 +1,22 @@
 #!/bin/bash
 
-# test command line arguments
-out=$(php leproxy.php --help) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-out=$(php leproxy.php -h) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-out=$(php leproxy.php --unknown 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
-out=$(php leproxy.php --unknown 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-out=$(php leproxy.php invalid 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-out=$(php leproxy.php 8080 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-out=$(php leproxy.php user:pass@[::] --allow-unprotected 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-out=$(php leproxy.php --proxy= 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-out=$(php leproxy.php --proxy=tcp://host/ 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+# test against first argument or search first file matching "leproxy*.php"
+bin=${1:-$(ls -b leproxy*.php | head -n1 || echo leproxy.php)}
+echo "Testing $bin"
 
-killall php 2>&- 1>&-s || true
-php leproxy.php 127.0.0.1:8180 &
+# test command line arguments
+out=$(php $bin --help) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php $bin -h) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php $bin --unknown 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(php $bin --unknown 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php $bin invalid 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php $bin 8080 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php $bin user:pass@[::] --allow-unprotected 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php $bin --proxy= 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(php $bin --proxy=tcp://host/ 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
+killall php 2>&- 1>&- || true
+php $bin 127.0.0.1:8180 &
 sleep 2
 
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
@@ -30,8 +34,8 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://test.
 out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8180 http://test.invalid/test 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 
 # restart LeProxy on IPv6 address
-killall php 2>&- 1>&-s || true
-php leproxy.php [::]:8180 &
+killall php 2>&- 1>&- || true
+php $bin [::]:8180 &
 sleep 2
 
 out=$(curl -v --head --silent --fail --proxy http://[::1]:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
@@ -42,8 +46,8 @@ out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8180 http://react
 [ -n "$TRAVIS" ] || out=$(curl -v --head --silent --fail --proxy socks5://[::1]:8180 http://[::1]:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
 # restart LeProxy with authentication required
-killall php 2>&- 1>&-s || true
-php leproxy.php user:pass@127.0.0.1:8180 &
+killall php 2>&- 1>&- || true
+php $bin user:pass@127.0.0.1:8180 &
 sleep 2
 
 # authentication should work
@@ -55,7 +59,7 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactp
 out=$(curl -v --head --silent --fail --proxy socks5://127.0.0.1:8180 http://reactphp.org 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 
 # start another LeProxy instance for HTTP proxy chaining / nesting
-php leproxy.php 127.0.0.1:8181 --proxy=http://user:pass@127.0.0.1:8180 &
+php $bin 127.0.0.1:8181 --proxy=http://user:pass@127.0.0.1:8180 &
 sleep 2
 
 # client does not need authentication because first chain passes to next via HTTP
@@ -63,7 +67,7 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8181 http://reactp
 out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8181 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
 # start another LeProxy instance for SOCKS proxy chaining / nesting
-php leproxy.php 127.0.0.1:8182 --proxy=socks://user:pass@127.0.0.1:8180 &
+php $bin 127.0.0.1:8182 --proxy=socks://user:pass@127.0.0.1:8180 &
 sleep 2
 
 # client does not need authentication because first chain passes to next via SOCKS

@@ -23,30 +23,31 @@ accepting both common HTTP and SOCKS proxy protocols on a single listening port.
 LeProxy requires only PHP.
 *PHP 7+ is highly recommended*, but it runs on any system that uses PHP 5.4+ or
 HHVM.
-
-If you're already familiar with [Composer](http://getcomposer.org), here's the
-quick install guide.
-Simply download LeProxy and run:
+If you have not installed PHP already, on a recent Ubuntu/Debian system, simply run:
 
 ```bash
-$ composer install --no-dev
+$ sudo apt-get install php7.0-cli
 ```
 
+**LeProxy is in early alpha and has no tagged releases yet**,
+please see [Development](#development) below on how to install this locally.
+
+<!--
+You can simply download the latest `leproxy-{version}.php` file from our
+[releases page](https://github.com/leproxy/leproxy/releases):
+
+[Latest release](https://github.com/leproxy/leproxy/releases/latest)
+
+Downloaded the `leproxy-{version}.php` file?
 You did it!! Really simple, huh?
+-->
 
-Anything unclear? Here's the full step-by-step guide:
-The recommend way to install LeProxy is to clone (or download) this repository
-and use [Composer](http://getcomposer.org) to download its dependencies.
-Therefore you'll need PHP, git and curl installed.
-For example, on a recent Ubuntu system, simply run:
-
-```bash
-$ sudo apt-get install php7.0 php7.0-cli git curl
-$ git clone https://github.com/leproxy/leproxy.git
-$ cd leproxy
-$ curl -s https://getcomposer.org/installer | php
-$ php composer.phar install --no-dev
-```
+> LeProxy is distributed as a PHP single file that contains everything you need
+  to run LeProxy.
+  The below examples assume you have saved this file as `leproxy.php` locally,
+  but you can use any name you want.
+  If you're interested in the more technical details of this file, you may want
+  to check out the [development instructions](#development) below.
 
 ## Usage
 
@@ -163,6 +164,80 @@ http://127.0.0.1:8080/pac
   all public HTTP requests.
   This means that hostnames that resolve to IPs from your local network will
   still use a direct connection without going through a proxy.
+
+## Development
+
+LeProxy is an open-source project and encourages everybody to participate in its
+development.
+
+You're interested in checking out how LeProxy works under the hood and/or want
+to contribute to the development of LeProxy?
+Then this section is for you!
+
+The recommended way to install LeProxy is to clone (or download) this repository
+and use [Composer](http://getcomposer.org) to download its dependencies.
+Therefore you'll need PHP, git and curl installed.
+For example, on a recent Ubuntu/debian system, simply run:
+
+```bash
+$ sudo apt-get install php7.0-cli git curl
+$ git clone https://github.com/leproxy/leproxy.git
+$ cd leproxy
+$ curl -s https://getcomposer.org/installer | php
+$ sudo mv composer.phar /usr/local/bin/composer
+$ composer install
+```
+
+That's it already!
+You should now be able to run the development version of LeProxy simply by
+running the `leproxy.php` file like this:
+
+```bash
+$ php leproxy.php
+```
+
+See also [usage](#usage) for more details.
+
+LeProxy uses a sophisticated test suite for functional tests and integration
+tests.
+To run the test suite, go to the project root and run:
+
+```bash
+$ php vendor/bin/phpunit
+```
+
+If you want to distribute LeProxy as a single standalone release file, you may
+compile the project into a single file like this:
+
+```bash
+$ php compile.php
+```
+
+> Note that compiling will temporarily uninstall all development dependencies
+  for distribution and then re-install the complete set of dependencies.
+  This should only take a second or two if you've previously installed its
+  dependencies already.
+  The compile script optionally accepts an output file name or will otherwise
+  try to look up the last release tag, such as `leproxy-v1.0.0.php`.
+
+In addition to the above test suite, LeProxy uses a simple bash/curl-based
+acceptance test setup which can also be used to check the resulting release
+file:
+
+```bash
+$ ./tests/acceptance.sh
+```
+
+> Note that the acceptance tests will try to locate a `leproxy*.php` file in
+  the project directory to run the tests against. You may optionally supply the
+  output file name to test against.
+
+Made some changes to your local development version?
+
+Make sure to let the world know! :shipit:
+We welcome PRs and would love to hear from you!
+
+Happy hacking!
 
 ## License
 
