@@ -1,7 +1,17 @@
 <?php
 
+// explicitly give VERSION via ENV or ask git for current version
+$version = getenv('VERSION');
+if ($version === false) {
+    $version = exec('git describe --always --dirty', $unused, $code);
+    if ($code !== 0) {
+        fwrite(STDERR, 'Error: Unable to get version info from git. Try passing VERSION via ENV' . PHP_EOL);
+        exit(1);
+    }
+}
+
 // use first argument as output file or use "leproxy-{version}.php"
-$out = isset($argv[1]) ? $argv[1] : ('leproxy-' . exec('git describe --always --dirty || echo dev') . '.php');
+$out = isset($argv[1]) ? $argv[1] : ('leproxy-' . $version . '.php');
 
 system('composer install --no-dev --classmap-authoritative');
 $classes = require __DIR__ . '/vendor/composer/autoload_classmap.php';
@@ -42,7 +52,7 @@ foreach ($files as $file) {
 }
 
 $file = 'leproxy.php';
-system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') | sed -e "s/development/release/" >> ' . escapeshellarg($out));
+system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') | sed -e "s/development/release/;/define(\'VERSION\'/c const VERSION=\"' . $version . '\";" >> ' . escapeshellarg($out));
 chmod($out, 0755);
 echo ' DONE (' . filesize($out) . ' bytes)' . PHP_EOL;
 
