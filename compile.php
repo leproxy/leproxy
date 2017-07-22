@@ -51,7 +51,22 @@ $small = '';
 $all = token_get_all(file_get_contents($out));
 foreach ($all as $i => $token) {
     if (is_array($token) && ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT)) {
+        // remove all comments
         unset($all[$i]);
+    } elseif (is_array($token) && $token[0] === T_PUBLIC) {
+        // get next non-whitespace token after `public` visibility
+        $next = $all[$i + 1];
+        if (is_array($next) && $next[0] === T_WHITESPACE) {
+            $next = $all[$i + 2];
+        }
+
+        if (is_array($next) && $next[0] === T_VARIABLE) {
+            // use shorter variable notation `public $a` => `var $a`
+            $all[$i] = array(T_VAR, 'var');
+        } else {
+            // remove unneeded public identifier `public static function a()` => `static function a()`
+            unset($all[$i]);
+        }
     }
 }
 $all = array_values($all);
