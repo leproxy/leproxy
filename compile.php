@@ -49,18 +49,28 @@ echo ' DONE (' . filesize($out) . ' bytes)' . PHP_EOL;
 echo 'Optimizing resulting file...';
 $small = '';
 $all = token_get_all(file_get_contents($out));
+
+// search next non-whitespace/non-comment token
+$next = function ($i) use (&$all) {
+    for ($i = $i + 1; !isset($all[$i]) || is_array($all[$i]) && ($all[$i][0] === T_COMMENT || $all[$i][0] === T_DOC_COMMENT || $all[$i][0] === T_WHITESPACE); ++$i);
+    return $i;
+};
+
+// search previous non-whitespace/non-comment token
+$prev = function ($i) use (&$all) {
+    for ($i = $i -1; $i >= 0 && (!isset($all[$i]) || (is_array($all[$i]) && ($all[$i][0] === T_COMMENT || $all[$i][0] === T_DOC_COMMENT || $all[$i][0] === T_WHITESPACE))); --$i);
+    return $i;
+};
+
 foreach ($all as $i => $token) {
     if (is_array($token) && ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT)) {
         // remove all comments
         unset($all[$i]);
     } elseif (is_array($token) && $token[0] === T_PUBLIC) {
         // get next non-whitespace token after `public` visibility
-        $next = $all[$i + 1];
-        if (is_array($next) && $next[0] === T_WHITESPACE) {
-            $next = $all[$i + 2];
-        }
+        $token = $all[$next($i)];
 
-        if (is_array($next) && $next[0] === T_VARIABLE) {
+        if (is_array($token) && $token[0] === T_VARIABLE) {
             // use shorter variable notation `public $a` => `var $a`
             $all[$i] = array(T_VAR, 'var');
         } else {
@@ -76,22 +86,35 @@ foreach ($all as $i => $token) {
         $all[$i][1] = (string)intval($token[1], 0);
     } elseif (is_array($token) && $token[0] === T_NEW) {
         // remove unneeded parenthesis for constructors without args `new a();` => `new a;`
-
-        // search next non-whitespace/non-comment token
-        $next = function ($i) use (&$all) {
-            $next = $all[++$i];
-            while (is_array($next) && ($next[0] === T_COMMENT || $next[0] === T_DOC_COMMENT || $next[0] === T_WHITESPACE)) {
-                $next = $all[++$i];
-            }
-            return $i;
-        };
-
         // jump over next token (class name), then next must be open parenthesis, followed by closing
         $open = $next($next($i));
         $close = $next($open);
         if ($all[$open] === '(' && $all[$close] === ')') {
             unset($all[$open], $all[$close]);
         }
+    } elseif (is_array($token) && $token[0] === T_STRING) {
+        // replace certain functions with their shorter alias function name
+        // http://php.net/manual/en/aliases.php
+        static $replace = array(
+            'implode' => 'join',
+            'fwrite' => 'fputs',
+            'array_key_exists' => 'key_exists',
+            'current' => 'pos',
+        );
+
+        // check this has a replacement and "looks like" a function call
+        // this works on a number of assumptions, such as not being aliased/namespaced
+        if (isset($replace[$token[1]])) {
+            $p = $all[$prev($i)];
+
+            if ($all[$next($i)] === '(' && (!is_array($p) || !in_array($p[0], array(T_FUNCTION, T_OBJECT_OPERATOR, T_DOUBLE_COLON, T_NEW)))) {
+                $all[$i][1] = $replace[$all[$i][1]];
+            }
+        }
+    } elseif (is_array($token) && $token[0] === T_EXIT) {
+        // replace `exit` with shorter alias `die`
+        // it's a language construct, not a function (see above)
+        $all[$i][1] = 'die';
     }
 }
 $all = array_values($all);
