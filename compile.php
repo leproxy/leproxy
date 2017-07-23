@@ -67,6 +67,13 @@ foreach ($all as $i => $token) {
             // remove unneeded public identifier `public static function a()` => `static function a()`
             unset($all[$i]);
         }
+    } elseif (is_array($token) && $token[0] === T_LNUMBER) {
+        // Use shorter integer notation `0x0F` => `15` and `011` => `9`.
+        // Technically, hex codes may be shorter for very large ints, but adding
+        // another 2 leading chars is rarely worth it.
+        // Optimizing floats is not really worth it, as they have many special
+        // cases, such as e-notation and we would lose types for `0.0` => `0`.
+        $all[$i][1] = (string)intval($token[1], 0);
     }
 }
 $all = array_values($all);
