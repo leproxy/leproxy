@@ -80,12 +80,12 @@ $all = array_values($all);
 foreach ($all as $i => $token) {
     if (is_array($token) && $token[0] === T_WHITESPACE) {
         if (strpos($token[1], "\n") !== false) {
-            $token = substr($small, -1) !== "\n" ? "\n" : '';
+            $token = strpos("()[]<>=+-*/%|,.:?!'\"\n", substr($small, -1)) === false ? "\n" : '';
         } else {
             $last = substr($small, -1);
             $next = isset($all[$i + 1]) ? substr(is_array($all[$i + 1]) ? $all[$i + 1][1] : $all[$i + 1], 0, 1) : ' ';
 
-            $token = (strpos('()[]{}<>;=+-*/%&|,.:?!@\'"' . PHP_EOL, $last) !== false || strpos('()[]{}<>;=+-*/%&|,.:?!@\'"' . '$', $next) !== false) ? '' : ' ';
+            $token = (strpos('()[]{}<>;=+-*/%&|,.:?!@\'"' . "\r\n", $last) !== false || strpos('()[]{}<>;=+-*/%&|,.:?!@\'"' . '$', $next) !== false) ? '' : ' ';
         }
     }
 
