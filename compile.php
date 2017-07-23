@@ -74,6 +74,24 @@ foreach ($all as $i => $token) {
         // Optimizing floats is not really worth it, as they have many special
         // cases, such as e-notation and we would lose types for `0.0` => `0`.
         $all[$i][1] = (string)intval($token[1], 0);
+    } elseif (is_array($token) && $token[0] === T_NEW) {
+        // remove unneeded parenthesis for constructors without args `new a();` => `new a;`
+
+        // search next non-whitespace/non-comment token
+        $next = function ($i) use (&$all) {
+            $next = $all[++$i];
+            while (is_array($next) && ($next[0] === T_COMMENT || $next[0] === T_DOC_COMMENT || $next[0] === T_WHITESPACE)) {
+                $next = $all[++$i];
+            }
+            return $i;
+        };
+
+        // jump over next token (class name), then next must be open parenthesis, followed by closing
+        $open = $next($next($i));
+        $close = $next($open);
+        if ($all[$open] === '(' && $all[$close] === ')') {
+            unset($all[$open], $all[$close]);
+        }
     }
 }
 $all = array_values($all);
