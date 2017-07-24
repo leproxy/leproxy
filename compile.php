@@ -115,6 +115,12 @@ foreach ($all as $i => $token) {
         // replace `exit` with shorter alias `die`
         // it's a language construct, not a function (see above)
         $all[$i][1] = 'die';
+    } elseif (is_array($token) && $token[0] === T_RETURN) {
+        // replace `return null;` with `return;`
+        $t = $next($i);
+        if (is_array($all[$t]) && $all[$t][0] === T_STRING && $all[$t][1] === 'null' && $all[$next($t)] === ';') {
+            unset($all[$t]);
+        }
     }
 }
 $all = array_values($all);
