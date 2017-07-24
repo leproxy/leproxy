@@ -44,7 +44,7 @@ foreach ($files as $file) {
 $file = 'leproxy.php';
 system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') >> ' . escapeshellarg($out));
 chmod($out, 0755);
-echo ' DONE' . PHP_EOL;
+echo ' DONE (' . filesize($out) . ' bytes)' . PHP_EOL;
 
 echo 'Optimizing resulting file...';
 $small = '';
@@ -70,4 +70,4 @@ foreach ($all as $i => $token) {
     $small .= isset($token[1]) ? $token[1] : $token;
 }
 file_put_contents($out, $small);
-echo ' DONE' . PHP_EOL;
+echo ' DONE (' . strlen($small) . ' bytes)' . PHP_EOL;
