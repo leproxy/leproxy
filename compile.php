@@ -44,7 +44,7 @@ echo ' DONE' . PHP_EOL;
 // resulting list of all includes and ordered class list
 $files = array_merge($includes, $ordered);
 echo 'Concatenating ' . count($files) . ' files into ' . $out . '...';
-system('head -n2 leproxy.php > ' . escapeshellarg($out));
+system('sed -n "/\#\!/,/^$/p" leproxy.php | sed -e "s/version dev/version ' . $version . '/" > ' . escapeshellarg($out));
 
 foreach ($files as $file) {
     $file = substr($file, strlen(__DIR__) + 1);
@@ -72,9 +72,14 @@ $prev = function ($i) use (&$all) {
     return $i;
 };
 
+$first = true;
 foreach ($all as $i => $token) {
     if (is_array($token) && ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT)) {
-        // remove all comments
+        // remove all comments except first
+        if ($first === true) {
+            $first = false;
+            continue;
+        }
         unset($all[$i]);
     } elseif (is_array($token) && $token[0] === T_PUBLIC) {
         // get next non-whitespace token after `public` visibility

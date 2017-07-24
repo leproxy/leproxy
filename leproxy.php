@@ -1,5 +1,16 @@
 #!/usr/bin/env php
 <?php
+/**
+ * LeProxy is the HTTP/SOCKS proxy server for everybody!
+ *
+ * LeProxy should be run from the command line. Assuming this file is
+ * named `leproxy.php`, try running `$ php leproxy.php --help`.
+ *
+ * @link https://leproxy.org/ LeProxy project homepage
+ * @license https://leproxy.org/#license MIT license
+ * @copyright 2017 Christian Lück
+ * @version dev
+ */
 
 namespace LeProxy\LeProxy;
 
