@@ -132,7 +132,7 @@ foreach ($all as $i => $token) {
             $last = substr($small, -1);
             $next = isset($all[$i + 1]) ? substr(is_array($all[$i + 1]) ? $all[$i + 1][1] : $all[$i + 1], 0, 1) : ' ';
 
-            $token = (strpos('()[]{}<>;=+-*/%&|,.:?!@\'"' . "\r\n", $last) !== false || strpos('()[]{}<>;=+-*/%&|,.:?!@\'"' . '$', $next) !== false) ? '' : ' ';
+            $token = (strpos('()[]{}<>;=+-*/%&|,.:?!@\'"' . "\r\n", $last) !== false || strpos('()[]{}<>;=+-*/%&|,.:?!@\'"' . '\\$', $next) !== false) ? '' : ' ';
         }
     }
 
