@@ -23,7 +23,9 @@ if (PHP_VERSION_ID < 50400 || PHP_SAPI !== 'cli') {
     exit(1);
 }
 
-define('VERSION', exec('git describe --always --dirty 2>/dev/null || echo unknown'));
+// get current version from git or default to "unknown" otherwise
+// this line will be replaced with the static const in the release file.
+define('VERSION', ltrim(exec('git describe --always --dirty 2>/dev/null || echo unknown'), 'v'));
 
 require __DIR__ . '/vendor/autoload.php';
 

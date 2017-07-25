@@ -3,7 +3,7 @@
 // explicitly give VERSION via ENV or ask git for current version
 $version = getenv('VERSION');
 if ($version === false) {
-    $version = exec('git describe --always --dirty', $unused, $code);
+    $version = ltrim(exec('git describe --always --dirty', $unused, $code), 'v');
     if ($code !== 0) {
         fwrite(STDERR, 'Error: Unable to get version info from git. Try passing VERSION via ENV' . PHP_EOL);
         exit(1);

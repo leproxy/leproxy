@@ -219,7 +219,7 @@ $ php compile.php
   dependencies already.
   The compile script optionally accepts the version number (`VERSION` env) and
   an output file name or will otherwise try to look up the last release tag,
-  such as `leproxy-v1.0.0.php`.
+  such as `leproxy-1.0.0.php`.
 
 In addition to the above test suite, LeProxy uses a simple bash/curl-based
 acceptance test setup which can also be used to check the resulting release
