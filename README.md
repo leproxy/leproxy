@@ -167,9 +167,8 @@ http://127.0.0.1:8080/pac
 
 ## Development
 
-LeProxy is an open-source project and encourages everybody to participate in its
-development.
-
+LeProxy is an [open-source project](#license) and encourages everybody to
+participate in its development.
 You're interested in checking out how LeProxy works under the hood and/or want
 to contribute to the development of LeProxy?
 Then this section is for you!
@@ -242,4 +241,18 @@ Happy hacking!
 
 ## License
 
-Released under the permissive [MIT license](LICENSE).
+LeProxy is an open source project released under the permissive
+[MIT license](LICENSE).
+
+LeProxy is standing on the shoulders of giants.
+Building something like LeProxy probably wouldn't be possible if not for the
+excellent open source projects that it builds on top of.
+In particular, it uses [ReactPHP](http://reactphp.org/) for its fast,
+event-driven architecture.
+
+All of its dependencies are managed through Composer, see also the
+[development section](#development) for more details.
+If you're using the [development version](#development), you may run
+`$ composer licenses --no-dev` to get a list of all runtime dependencies and their
+respective licenses.
+All these requirements are bundled into the single standalone release file.
