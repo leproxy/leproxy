@@ -130,6 +130,9 @@ $loop = Factory::create();
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain($args['proxy'], $loop);
 
+// log all connection attempts to STDOUT
+$connector = new LoggingConnector($connector);
+
 // create proxy server and start listening on given address
 $proxy = new LeProxyServer($loop, $connector);
 try {
