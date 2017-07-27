@@ -5,6 +5,7 @@ bin=${1:-$(ls -b leproxy*.php | head -n1 || echo leproxy.php)}
 echo "Testing $bin"
 
 # test command line arguments
+out=$(php $bin --version) && echo -n "OK (" && echo -n $out && echo ")" || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(php $bin --help) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(php $bin -h) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(php $bin --unknown 2>&1) && echo "FAIL: $out" && exit 1 || echo OK

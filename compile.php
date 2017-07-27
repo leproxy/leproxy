@@ -1,7 +1,17 @@
 <?php
 
+// explicitly give VERSION via ENV or ask git for current version
+$version = getenv('VERSION');
+if ($version === false) {
+    $version = ltrim(exec('git describe --always --dirty', $unused, $code), 'v');
+    if ($code !== 0) {
+        fwrite(STDERR, 'Error: Unable to get version info from git. Try passing VERSION via ENV' . PHP_EOL);
+        exit(1);
+    }
+}
+
 // use first argument as output file or use "leproxy-{version}.php"
-$out = isset($argv[1]) ? $argv[1] : ('leproxy-' . exec('git describe --always --dirty || echo dev') . '.php');
+$out = isset($argv[1]) ? $argv[1] : ('leproxy-' . $version . '.php');
 
 system('composer install --no-dev --classmap-authoritative');
 $classes = require __DIR__ . '/vendor/composer/autoload_classmap.php';
@@ -34,7 +44,7 @@ echo ' DONE' . PHP_EOL;
 // resulting list of all includes and ordered class list
 $files = array_merge($includes, $ordered);
 echo 'Concatenating ' . count($files) . ' files into ' . $out . '...';
-system('head -n2 leproxy.php > ' . escapeshellarg($out));
+system('sed -n "/\#\!/,/^$/p" leproxy.php | sed -e "s/version dev/version ' . $version . '/" > ' . escapeshellarg($out));
 
 foreach ($files as $file) {
     $file = substr($file, strlen(__DIR__) + 1);
@@ -42,7 +52,7 @@ foreach ($files as $file) {
 }
 
 $file = 'leproxy.php';
-system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') >> ' . escapeshellarg($out));
+system('(echo "# ' . $file . '"; egrep -v "^<\?php|^require " ' . escapeshellarg($file) . ') | sed -e "s/development/release/;/define(\'VERSION\'/c const VERSION=\"' . $version . '\";" >> ' . escapeshellarg($out));
 chmod($out, 0755);
 echo ' DONE (' . filesize($out) . ' bytes)' . PHP_EOL;
 
@@ -62,9 +72,14 @@ $prev = function ($i) use (&$all) {
     return $i;
 };
 
+$first = true;
 foreach ($all as $i => $token) {
     if (is_array($token) && ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT)) {
-        // remove all comments
+        // remove all comments except first
+        if ($first === true) {
+            $first = false;
+            continue;
+        }
         unset($all[$i]);
     } elseif (is_array($token) && $token[0] === T_PUBLIC) {
         // get next non-whitespace token after `public` visibility
