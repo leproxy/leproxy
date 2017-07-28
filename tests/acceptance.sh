@@ -17,7 +17,7 @@ out=$(php $bin --proxy= 2>&1 || true) && echo "$out" | grep -q "see --help" && e
 out=$(php $bin --proxy=tcp://host/ 2>&1 || true) && echo "$out" | grep -q "see --help" && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
 killall php 2>&- 1>&- || true
-php $bin 127.0.0.1:8180 &
+php $bin 127.0.0.1:8180 --no-log &
 sleep 2
 
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
@@ -36,7 +36,7 @@ out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8180 http://test.
 
 # restart LeProxy on IPv6 address
 killall php 2>&- 1>&- || true
-php $bin [::]:8180 &
+php $bin [::]:8180 --no-log &
 sleep 2
 
 out=$(curl -v --head --silent --fail --proxy http://[::1]:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
@@ -48,7 +48,7 @@ out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8180 http://react
 
 # restart LeProxy with authentication required
 killall php 2>&- 1>&- || true
-php $bin user:pass@127.0.0.1:8180 &
+php $bin user:pass@127.0.0.1:8180 --no-log &
 sleep 2
 
 # authentication should work
@@ -60,7 +60,7 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactp
 out=$(curl -v --head --silent --fail --proxy socks5://127.0.0.1:8180 http://reactphp.org 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
 
 # start another LeProxy instance for HTTP proxy chaining / nesting
-php $bin 127.0.0.1:8181 --proxy=http://user:pass@127.0.0.1:8180 &
+php $bin 127.0.0.1:8181 --proxy=http://user:pass@127.0.0.1:8180 --no-log &
 sleep 2
 
 # client does not need authentication because first chain passes to next via HTTP
@@ -68,7 +68,7 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8181 http://reactp
 out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8181 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
 # start another LeProxy instance for SOCKS proxy chaining / nesting
-php $bin 127.0.0.1:8182 --proxy=socks://user:pass@127.0.0.1:8180 &
+php $bin 127.0.0.1:8182 --proxy=socks://user:pass@127.0.0.1:8180 --no-log &
 sleep 2
 
 # client does not need authentication because first chain passes to next via SOCKS
