@@ -136,7 +136,7 @@ $connector = ConnectorFactory::createConnectorChain($args['proxy'], $loop);
 
 // log all connection attempts to STDOUT (unless `--no-log` has been given)
 if (!isset($args['no-log'])) {
-    $connector = new LoggingConnector($connector);
+    $connector = new LoggingConnector($connector, new Logger());
 }
 
 // create proxy server and start listening on given address
