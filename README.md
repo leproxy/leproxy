@@ -22,7 +22,7 @@ accepting both common HTTP and SOCKS proxy protocols on a single listening port.
 * [Development](#development)
 * [License](#license)
 
-> Note that this is a very early alpha version and that
+> Note that this is a early beta version and that
   LeProxy is under active development.
   Many new features are going to be added in the future!
 
@@ -37,10 +37,6 @@ If you have not installed PHP already, on a recent Ubuntu/Debian system, simply 
 $ sudo apt-get install php7.0-cli
 ```
 
-**LeProxy is in early alpha and has no tagged releases yet**,
-please see [Development](#development) below on how to install this locally.
-
-<!--
 You can simply download the latest `leproxy-{version}.php` file from our
 [releases page](https://github.com/leproxy/leproxy/releases):
 
@@ -48,7 +44,6 @@ You can simply download the latest `leproxy-{version}.php` file from our
 
 Downloaded the `leproxy-{version}.php` file?
 You did it!! Really simple, huh?
--->
 
 > LeProxy is distributed as a PHP single file that contains everything you need
   to run LeProxy.
