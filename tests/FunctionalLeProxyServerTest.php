@@ -40,7 +40,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $origin->listen($this->socketOrigin);
 
         $proxy = new LeProxyServer($this->loop);
-        $this->socketProxy = $proxy->listen('127.0.0.1:8084');
+        $this->socketProxy = $proxy->listen('127.0.0.1:8084', false);
 
         $this->proxy = $this->socketProxy->getAddress();
     }
@@ -216,6 +216,58 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $this->assertStringStartsWith("HTTP/1.1 502 Bad Gateway\r\n", $response);
         $this->assertContains("Server: LeProxy\r\n", $response);
         $this->assertContains("\r\n\r\nUnable to connect:", $response);
+    }
+
+    public function testConnectGetWithValidAuth()
+    {
+        $this->socketProxy->close();
+        $proxy = new LeProxyServer($this->loop);
+        $this->socketProxy = $proxy->listen('user:pass@127.0.0.1:8084', false);
+        $this->proxy = $this->socketProxy->getAddress();
+
+        // connect to proxy and send CONNECT requets and then normal request
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("CONNECT 127.0.0.1:8082 HTTP/1.1\r\nProxy-Authorization: Basic dXNlcjpwYXNz\r\n\r\n");
+
+            $conn->once('data', function () use ($conn) {
+                $conn->write("GET / HTTP/1.1\r\n\r\n");
+            });
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.2);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("Server: LeProxy\r\n", $response);
+        $this->assertContains("\r\n\r\nHTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
+    }
+
+    public function testConnectGetWithInvalidAuthFails()
+    {
+        $this->socketProxy->close();
+        $proxy = new LeProxyServer($this->loop);
+        $this->socketProxy = $proxy->listen('user:pass@127.0.0.1:8084', false);
+        $this->proxy = $this->socketProxy->getAddress();
+
+        // connect to proxy and send CONNECT requets and then normal request
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("CONNECT 127.0.0.1:8082 HTTP/1.1\r\n\r\n");
+
+            $conn->once('data', function () use ($conn) {
+                $conn->write("GET / HTTP/1.1\r\n\r\n");
+            });
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.2);
+
+        $this->assertStringStartsWith("HTTP/1.1 407 Proxy Authentication Required\r\n", $response);
+        $this->assertContains("Server: LeProxy\r\n", $response);
     }
 
     public function testPacDirect()

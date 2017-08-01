@@ -12,6 +12,7 @@ use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
 use React\Socket\ServerInterface;
 use Exception;
+use React\Stream\ReadableStreamInterface;
 
 class HttpProxyServer
 {
@@ -28,6 +29,13 @@ class HttpProxyServer
         'Server' => 'LeProxy',
         'X-Powered-By' => ''
     );
+
+    /**
+     * Whether to allow unprotected access from outside or only allow local access
+     *
+     * @var bool
+     */
+    public $allowUnprotected = true;
 
     public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
     {
@@ -51,6 +59,12 @@ class HttpProxyServer
     /** @internal */
     public function handleRequest(ServerRequestInterface $request)
     {
+        // assign client source address as attribute for connection logging
+        $params = $request->getServerParams();
+        if (isset($params['REMOTE_ADDR'], $params['REMOTE_PORT'])) {
+            $request = $request->withAttribute('source', 'http://' . $params['REMOTE_ADDR'] . ':' . $params['REMOTE_PORT']);
+        }
+
         // direct (origin / non-proxy) requests start with a slash
         $direct = substr($request->getRequestTarget(), 0, 1) === '/';
 
@@ -68,6 +82,7 @@ class HttpProxyServer
                 }
             }
 
+            // reject invalid authentication
             if (!$auth || !isset($this->auth[$auth[0]]) || $this->auth[$auth[0]] !== $auth[1]) {
                 return new Response(
                     407,
@@ -76,6 +91,31 @@ class HttpProxyServer
                         'Content-Type' => 'text/plain'
                     ) + $this->headers,
                     'LeProxy HTTP/SOCKS proxy: Valid proxy authentication required'
+                );
+            }
+
+            // add username/password to source address attribute
+            $source = $request->getAttribute('source');
+            if ($source !== null) {
+                $request = $request->withAttribute(
+                    'source',
+                    str_replace(
+                        '://',
+                        '://' . rawurlencode($auth[0]) . ':' . rawurlencode($auth[1]) . '@',
+                        $source
+                    )
+                );
+            }
+        } elseif (!$this->allowUnprotected) {
+            // reject requests not coming from 127.0.0.1/8 or IPv6 equivalent (protected mode)
+            $params = $request->getServerParams();
+            if (isset($params['REMOTE_ADDR']) && !ConnectorFactory::isIpLocal(trim($params['REMOTE_ADDR'], '[]'))) {
+                return new Response(
+                    403,
+                    array(
+                        'Content-Type' => 'text/plain'
+                    ) + $this->headers,
+                    'LeProxy HTTP/SOCKS proxy is running in protected mode and allows local access only'
                 );
             }
         }
@@ -101,8 +141,15 @@ class HttpProxyServer
     /** @internal */
     public function handleConnectRequest(ServerRequestInterface $request)
     {
+        // add client source address for connection logging
+        $uri = $request->getRequestTarget();
+        $source = $request->getAttribute('source');
+        if ($source !== null) {
+            $uri .= '?source=' . rawurlencode($source);
+        }
+
         // try to connect to given target host
-        return $this->connector->connect($request->getRequestTarget())->then(
+        return $this->connector->connect($uri)->then(
             function (ConnectionInterface $remote) {
                 // connection established => forward data
                 return new Response(
@@ -134,6 +181,19 @@ class HttpProxyServer
         $headers = $incoming->getHeaders();
         if (!$request->hasHeader('User-Agent')) {
             $headers['User-Agent'] = array();
+        }
+
+        // add client source address for connection logging
+        $source = $request->getAttribute('source');
+        if ($source !== null) {
+            $connector = new SourceConnector($this->connector, $source);
+
+            // Move along, folks. Nothing to see here.
+            // $this->client->connector = $connector;
+            $ref = new \ReflectionObject($this->client);
+            $ref = $ref->getProperty('connector');
+            $ref->setAccessible(true);
+            $ref->setValue($this->client, $connector);
         }
 
         $outgoing = $this->client->request(
@@ -185,7 +245,12 @@ class HttpProxyServer
             ));
         });
 
-        $incoming->getBody()->pipe($outgoing);
+        $body = $incoming->getBody();
+        if ($body instanceof ReadableStreamInterface) {
+            $body->pipe($outgoing);
+        } else {
+            $outgoing->end((string)$body);
+        }
 
         return $deferred->promise();
     }
@@ -210,7 +275,23 @@ class HttpProxyServer
             array(
                 'Content-Type' => 'application/x-ns-proxy-autoconfig',
             ) + $this->headers,
-            'function FindProxyForURL(url, host) { return "PROXY ' . $uri . '"; }' . PHP_EOL
-        );
+            <<<EOF
+function FindProxyForURL(url, host) {
+    if (isPlainHostName(host) ||
+        shExpMatch(host, "*.local") ||
+        shExpMatch(host, "*.localhost") ||
+        isInNet(dnsResolve(host), "10.0.0.0", "255.0.0.0") ||
+        isInNet(dnsResolve(host), "172.16.0.0", "255.240.0.0") ||
+        isInNet(dnsResolve(host), "192.168.0.0", "255.255.0.0") ||
+        isInNet(dnsResolve(host), "127.0.0.0", "255.0.0.0")
+    ) {
+        return "DIRECT";
+    }
+
+    return "PROXY $uri";
+}
+
+EOF
+);
     }
 }

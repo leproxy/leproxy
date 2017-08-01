@@ -8,6 +8,7 @@ use React\Socket\Connector;
 use React\Socket\ConnectorInterface;
 use React\Socket\Server as Socket;
 use InvalidArgumentException;
+use React\Socket\ConnectionInterface;
 
 /**
  * Integrates HTTP and SOCKS proxy servers into a single server instance
@@ -29,25 +30,30 @@ class LeProxyServer
 
     /**
      * @param string $listen
+     * @param bool   $allowUnprotected
      * @return \React\Socket\ServerInterface
      * @throws \InvalidArgumentException
      */
-    public function listen($listen)
+    public function listen($listen, $allowUnprotected)
     {
-        // prepend default scheme
-        $pos = strpos($listen, '://');
-        if ($pos === false) {
-            $listen = 'http://' . $listen;
+        $nullport = false;
+        if (substr($listen, -2) === ':0') {
+            $nullport = true;
+            $listen = substr($listen, 0, -2) . ':10000';
         }
 
-        $parts = parse_url($listen);
+        $parts = parse_url('http://' . $listen);
         if (!$parts || !isset($parts['scheme'], $parts['host'], $parts['port'])) {
             throw new InvalidArgumentException('Invalid URI for listening address');
         }
 
+        if ($nullport) {
+            $parts['port'] = 0;
+        }
+
         $socket = new Socket($parts['host'] . ':' . $parts['port'], $this->loop);
 
-        // start new proxy server which uses the above connector for forwarding
+        // start new proxy server which uses the given connector for forwarding/chaining
         $unification = new ProtocolDetector($socket);
         $http = new HttpProxyServer($this->loop, $unification->http, $this->connector);
         $socks = new SocksServer($this->loop, $unification->socks, $this->connector);
@@ -60,6 +66,24 @@ class LeProxyServer
 
             $http->setAuthArray($auth);
             $socks->setAuthArray($auth);
+        } elseif (!$allowUnprotected) {
+            // no authentication required, so only allow local requests (protected mode)
+            $http->allowUnprotected = false;
+
+            // SOCKS works by setting authentication on a per-connection basis
+            $socks->on('connection', function (ConnectionInterface $conn) use ($socks) {
+                $remote = parse_url($conn->getRemoteAddress(), PHP_URL_HOST);
+                if ($remote === null || ConnectorFactory::isIpLocal(trim($remote, '[]'))) {
+                    // do not require authentication for local requests
+                    $socks->unsetAuth();
+                } else {
+                    // enforce authentication, but always fail for non-local requests
+                    // this implies that SOCKS4 will be rejected right away
+                    $socks->setAuth(function () {
+                        return false;
+                    });
+                }
+            });
         }
 
         return $socket;

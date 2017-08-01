@@ -12,4 +12,5 @@ install:
 
 script:
   - vendor/bin/phpunit
+  - php compile.php
   - ./tests/acceptance.sh
