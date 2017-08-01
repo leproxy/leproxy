@@ -14,6 +14,14 @@ family and friends without having to worry about third parties.
 It provides compatibility with a large number of clients and services by
 accepting both common HTTP and SOCKS proxy protocols on a single listening port.
 
+**Table of contents**
+
+* [Install](#install)
+* [Usage](#usage)
+* [Clients](#clients)
+* [Development](#development)
+* [License](#license)
+
 > Note that this is a very early alpha version and that
   LeProxy is under active development.
   Many new features are going to be added in the future!
