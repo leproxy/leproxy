@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b58ced23da83f401dd974ba232ec245a",
+    "content-hash": "c027d283957a060df0c98e4e8b2b74ba",
     "packages": [
         {
             "name": "clue/commander",
@@ -111,16 +111,16 @@
         },
         {
             "name": "clue/socks-react",
-            "version": "v0.8.3",
+            "version": "v0.8.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-socks-react.git",
-                "reference": "4442bcfbe019721f17f652ee257e2e8539c764af"
+                "reference": "7a6eea83478d291100003584755be9d2a877ed24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/4442bcfbe019721f17f652ee257e2e8539c764af",
-                "reference": "4442bcfbe019721f17f652ee257e2e8539c764af",
+                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/7a6eea83478d291100003584755be9d2a877ed24",
+                "reference": "7a6eea83478d291100003584755be9d2a877ed24",
                 "shasum": ""
             },
             "require": {
@@ -162,7 +162,7 @@
                 "socks server",
                 "tcp tunnel"
             ],
-            "time": "2017-07-18T10:44:17+00:00"
+            "time": "2017-07-27T07:44:09+00:00"
         },
         {
             "name": "evenement/evenement",

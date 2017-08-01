@@ -38,7 +38,7 @@ $commander->add('-h | --help', function () {
     exit('LeProxy HTTP/SOCKS proxy
 
 Usage:
-    $ php leproxy.php [<listenAddress>] [--allow-unprotected] [--proxy=<upstreamProxy>...]
+    $ php leproxy.php [<listenAddress>] [--allow-unprotected] [--proxy=<upstreamProxy>...] [--no-log]
     $ php leproxy.php --version
     $ php leproxy.php --help
 
@@ -70,6 +70,10 @@ Arguments:
         and password, host and port. Default scheme is `http://`, default port
         is `8080` for all schemes.
 
+    --no-log
+        By default, LeProxy logs all connection attempts to STDOUT for
+        debugging purposes. This can be avoided by passing this argument.
+
     --version
         Prints the current version of LeProxy and exits.
 
@@ -91,7 +95,7 @@ Examples:
         an upstream proxy server that requires authentication.
 ');
 });
-$commander->add('[--allow-unprotected] [--proxy=<upstreamProxy>...] [<listen>]', function ($args) {
+$commander->add('[--allow-unprotected] [--proxy=<upstreamProxy>...] [--no-log] [<listen>]', function ($args) {
     // validate all upstream proxy URIs if given
     if (isset($args['proxy'])) {
         foreach ($args['proxy'] as &$uri) {
@@ -129,6 +133,11 @@ $loop = Factory::create();
 
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain($args['proxy'], $loop);
+
+// log all connection attempts to STDOUT (unless `--no-log` has been given)
+if (!isset($args['no-log'])) {
+    $connector = new LoggingConnector($connector, new Logger());
+}
 
 // create proxy server and start listening on given address
 $proxy = new LeProxyServer($loop, $connector);

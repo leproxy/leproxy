@@ -122,6 +122,18 @@ the chain:
 $ php leproxy.php --proxy=127.1.1.1:8080 --proxy=127.2.2.2:8080 --proxy=127.3.3.3:8080
 ```
 
+By default, LeProxy prints a log message for every connection attempt to the
+console output (STDOUT) for debugging and analysis purposes.
+For privacy reasons, it does not persist (store) these log messages on its own.
+If you do not want LeProxy to log anything, you may also pass the `--no-log`
+flag.
+If you want to persist the log to a log file, you may use standard operating
+system facilities such as `tee` to redirect the output to a file:
+
+```bash
+$ php leproxy.php | tee -a leproxy.log
+```
+
 ## Clients
 
 Once LeProxy is running, you can start using it with pretty much any client
