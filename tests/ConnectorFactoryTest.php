@@ -214,6 +214,21 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
         $allow = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
         $allow->expects($this->once())->method('connect')->with('tls://google.com:443');
 
+        $connector = ConnectorFactory::createBlockingConnector(array(':80'), $allow);
+
+        $this->assertInstanceOf('React\Socket\ConnectorInterface', $connector);
+        $this->assertPromiseRejected($connector->connect('google.com:80'));
+        $this->assertPromiseRejected($connector->connect('tcp://google.com:80'));
+        $this->assertPromiseRejected($connector->connect('tcp://github.com:80'));
+
+        $connector->connect('tls://google.com:443');
+    }
+
+    public function testBlockHttpPortWildcardDomain()
+    {
+        $allow = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $allow->expects($this->once())->method('connect')->with('tls://google.com:443');
+
         $connector = ConnectorFactory::createBlockingConnector(array('*:80'), $allow);
 
         $this->assertInstanceOf('React\Socket\ConnectorInterface', $connector);

@@ -147,8 +147,9 @@ class ConnectorFactory
     /**
      * Creates a new connector that only blocks all hosts from the given block list
      *
-     * The block list may contain any number of host entries in the form `host`
-     * or `host:port` and may contain `*` wildcard to match anything.
+     * The block list may contain any number of host entries in the form
+     * `host:port` or just `host` or `:port` and may contain `*` wildcard to
+     * match anything.
      *
      * Any host that is not on the block list will be forwarded through the base
      * connector given as the second argument.
@@ -164,6 +165,11 @@ class ConnectorFactory
         // reject all hosts given in the block list
         $filter = array();
         foreach ($block as $host) {
+            // prefix `:port` => `*:port`
+            if (isset($host[0]) && $host[0] === ':') {
+                $host = '*' . $host;
+            }
+
             $filter[$host] = $reject;
 
             // also reject all subdomains (*.domain), unless this already matches

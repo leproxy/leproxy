@@ -94,8 +94,8 @@ each incoming proxy request.
 If you want to block access to certain destination hosts and/or ports, you may
 blacklist these by passing the `--block=<destination>` argument.
 Any number of destination addresses can be given.
-Each destination address can be in the form `host` or `host:port` and `host`
-may contain the `*` wildcard to match anything.
+Each destination address can be in the form `host:port` or just `host` or
+`:port` and `host` may contain the `*` wildcard to match anything.
 Subdomains for each host will automatically be blocked.
 For example, the following can be used to block access to `youtube.com` (and its
 subdomains such as `www.youtube.com`) and port 80 on all hosts (standard
