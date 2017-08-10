@@ -89,6 +89,29 @@ $ php leproxy.php username:password@0.0.0.0:8080
 > If the username or password contains special characters, make sure to use
   URL encoded values (percent-encoding) such as `p%40ss` for `p@ss`.
 
+By default, LeProxy allows connections to every destination address as given in
+each incoming proxy request.
+If you want to block access to certain destination hosts and/or ports, you may
+blacklist these by passing the `--block=<destination>` argument.
+Any number of destination addresses can be given.
+Each destination address can be in the form `host` or `host:port` and `host`
+may contain the `*` wildcard to match anything.
+Subdomains for each host will automatically be blocked.
+For example, the following can be used to block access to `youtube.com` (and its
+subdomains such as `www.youtube.com`) and port 80 on all hosts (standard
+plaintext HTTP port):
+
+```bash
+$ php leproxy.php --block=youtube.com --block=*:80
+```
+
+> Note that the block list operates on the destination addresses as given in the
+  incoming proxy request. Some [clients](#clients) use local DNS resolution and
+  do not transmit hostnames, but only the resolved destination IP addresses
+  (particularly common for the SOCKS protocol).
+  Make sure to configure your client to use remote DNS resolution accordingly
+  and/or also block access to relevant IP addresses.
+
 By default, Leproxy creates a direct connection to the destination address for
 each incoming proxy request.
 In this mode, the destination doesn't see the original client address, but only

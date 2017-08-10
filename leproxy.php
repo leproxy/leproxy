@@ -38,7 +38,7 @@ $commander->add('-h | --help', function () {
     exit('LeProxy HTTP/SOCKS proxy
 
 Usage:
-    $ php leproxy.php [<listenAddress>] [--allow-unprotected] [--proxy=<upstreamProxy>...] [--no-log]
+    $ php leproxy.php [<listenAddress>] [--allow-unprotected] [--block=<destination>...] [--proxy=<upstreamProxy>...] [--no-log]
     $ php leproxy.php --version
     $ php leproxy.php --help
 
@@ -61,6 +61,13 @@ Arguments:
         If you have ensured only legit users can access your system, you can
         pass the `--allow-unprotected` flag to forward requests from all hosts.
         This option should be used with care, you have been warned.
+
+    --block=<destination>
+        Blocks forwarding connections to the given destination address.
+        Any number of destination addresses can be given.
+        Each destination address can be in the form `host` or `host:port` and
+        `host` may contain the `*` wildcard to match anything.
+        Subdomains for each host will automatically be blocked.
 
     --proxy=<upstreamProxy>
         An upstream proxy server where each connection request will be
@@ -90,12 +97,16 @@ Examples:
     $ php leproxy.php user:pass@0.0.0.0:8080
         Runs LeProxy on public default addresses and require authentication
 
+    $ php leproxy.php --block=youtube.com --block=*:80
+        Runs LeProxy on default address and blocks access to youtube.com and
+        port 80 on all hosts (standard plaintext HTTP port).
+
     $ php leproxy.php --proxy=http://user:pass@127.1.1.1:8080
         Runs LeProxy so that all connection requests will be forwarded through
         an upstream proxy server that requires authentication.
 ');
 });
-$commander->add('[--allow-unprotected] [--proxy=<upstreamProxy>...] [--no-log] [<listen>]', function ($args) {
+$commander->add('[--allow-unprotected] [--block=<host>...] [--proxy=<upstreamProxy>...] [--no-log] [<listen>]', function ($args) {
     // validate all upstream proxy URIs if given
     if (isset($args['proxy'])) {
         foreach ($args['proxy'] as &$uri) {
@@ -133,6 +144,11 @@ $loop = Factory::create();
 
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain($args['proxy'], $loop);
+
+// block certain hosts if `--block=` has been given
+if (isset($args['block'])) {
+    $connector = ConnectorFactory::createBlockingConnector($args['block'], $connector);
+}
 
 // log all connection attempts to STDOUT (unless `--no-log` has been given)
 if (!isset($args['no-log'])) {

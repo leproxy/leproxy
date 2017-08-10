@@ -46,6 +46,25 @@ out=$(curl -v --head --silent --fail --proxy socks://[::1]:8180 http://reactphp.
 out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 [ -n "$TRAVIS" ] || out=$(curl -v --head --silent --fail --proxy socks5://[::1]:8180 http://[::1]:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
+# restart LeProxy with hosts and plain HTTP port blocked
+killall php 2>&- 1>&- || true
+php $bin 127.0.0.1:8180 --block=youtube.com --block=*.google.com --block=*:80 --no-log &
+sleep 2
+
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 https://youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://www.google.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 https://www.google.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 http://www.google.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://google.de 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 http://www.google.de 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://www.youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 https://www.youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || echo OK
+
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://google.de 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 https://google.de 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
 # restart LeProxy with authentication required
 killall php 2>&- 1>&- || true
 php $bin user:pass@127.0.0.1:8180 --no-log &
