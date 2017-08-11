@@ -145,6 +145,29 @@ class ConnectorFactory
     }
 
     /**
+     * Parses the given block URI and ensures it only contains a host and optional port or throws on error
+     *
+     * @param string $uri
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function coerceBlockUri($uri)
+    {
+        // prefix `:port` => `*:port`
+        if (isset($uri[0]) && $uri[0] === ':') {
+            $uri = '*' . $uri;
+        }
+
+        $excess = $parts = parse_url('tcp://' . $uri);
+        unset($excess['scheme'], $excess['host'], $excess['port']);
+        if (!$parts || !isset($parts['scheme'], $parts['host']) || $excess) {
+            throw new \InvalidArgumentException('Invalid block address');
+        }
+
+        return $parts['host'] . (isset($parts['port']) ? (':' . $parts['port']) : '');
+    }
+
+    /**
      * Creates a new connector that only blocks all hosts from the given block list
      *
      * The block list may contain any number of host entries in the form
@@ -165,11 +188,6 @@ class ConnectorFactory
         // reject all hosts given in the block list
         $filter = array();
         foreach ($block as $host) {
-            // prefix `:port` => `*:port`
-            if (isset($host[0]) && $host[0] === ':') {
-                $host = '*' . $host;
-            }
-
             $filter[$host] = $reject;
 
             // also reject all subdomains (*.domain), unless this already matches
