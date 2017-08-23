@@ -16,6 +16,7 @@ namespace LeProxy\LeProxy;
 
 use Clue\Commander\Router;
 use Clue\Commander\NoRouteFoundException;
+use Clue\Commander\Tokens\Tokenizer;
 use React\EventLoop\Factory;
 
 if (PHP_VERSION_ID < 50400 || PHP_SAPI !== 'cli') {
@@ -30,7 +31,16 @@ define('VERSION', ltrim(exec('git describe --always --dirty 2>/dev/null || echo 
 require __DIR__ . '/vendor/autoload.php';
 
 // parse options from command line arguments (argv)
-$commander = new Router();
+$tokenizer = new Tokenizer();
+$tokenizer->addFilter('block', function (&$value) {
+    $value = ConnectorFactory::coerceBlockUri($value);
+    return true;
+});
+$tokenizer->addFilter('proxy', function (&$value) {
+    $value = ConnectorFactory::coerceProxyUri($value);
+    return true;
+});
+$commander = new Router($tokenizer);
 $commander->add('--version', function () {
     exit('LeProxy development version ' . VERSION . PHP_EOL);
 });
@@ -106,16 +116,7 @@ Examples:
         an upstream proxy server that requires authentication.
 ');
 });
-$commander->add('[--allow-unprotected] [--block=<host>...] [--proxy=<upstreamProxy>...] [--no-log] [<listen>]', function ($args) {
-    // validate all upstream proxy URIs if given
-    if (isset($args['proxy'])) {
-        foreach ($args['proxy'] as &$uri) {
-            $uri = ConnectorFactory::coerceProxyUri($uri);
-        }
-    } else {
-        $args['proxy'] = array();
-    }
-
+$commander->add('[--allow-unprotected] [--block=<block:block>...] [--proxy=<proxy:proxy>...] [--no-log] [<listen>]', function ($args) {
     // validate listening URI or assume default URI
     $args['listen'] = ConnectorFactory::coerceListenUri(isset($args['listen']) ? $args['listen'] : '');
 
@@ -143,7 +144,7 @@ try {
 $loop = Factory::create();
 
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
-$connector = ConnectorFactory::createConnectorChain($args['proxy'], $loop);
+$connector = ConnectorFactory::createConnectorChain(isset($args['proxy']) ? $args['proxy'] : array(), $loop);
 
 // block certain hosts if `--block=` has been given
 if (isset($args['block'])) {
@@ -177,7 +178,7 @@ if (strpos($args['listen'], '@') !== false) {
 }
 echo ')' . PHP_EOL;
 
-if ($args['proxy']) {
+if (isset($args['proxy'])) {
     echo 'Forwarding via: ' . implode(' -> ', $args['proxy']) . PHP_EOL;
 }
 

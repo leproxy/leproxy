@@ -145,10 +145,34 @@ class ConnectorFactory
     }
 
     /**
+     * Parses the given block URI and ensures it only contains a host and optional port or throws on error
+     *
+     * @param string $uri
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function coerceBlockUri($uri)
+    {
+        // prefix `:port` => `*:port`
+        if (isset($uri[0]) && $uri[0] === ':') {
+            $uri = '*' . $uri;
+        }
+
+        $excess = $parts = parse_url('tcp://' . $uri);
+        unset($excess['scheme'], $excess['host'], $excess['port']);
+        if (!$parts || !isset($parts['scheme'], $parts['host']) || $excess) {
+            throw new \InvalidArgumentException('Invalid block address');
+        }
+
+        return $parts['host'] . (isset($parts['port']) ? (':' . $parts['port']) : '');
+    }
+
+    /**
      * Creates a new connector that only blocks all hosts from the given block list
      *
-     * The block list may contain any number of host entries in the form `host`
-     * or `host:port` and may contain `*` wildcard to match anything.
+     * The block list may contain any number of host entries in the form
+     * `host:port` or just `host` or `:port` and may contain `*` wildcard to
+     * match anything.
      *
      * Any host that is not on the block list will be forwarded through the base
      * connector given as the second argument.

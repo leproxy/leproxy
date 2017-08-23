@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d49ddf6baf7f1138d231f2c691051f47",
+    "content-hash": "6b2812fccc2df0c910bf94fa94bfe7f7",
     "packages": [
         {
             "name": "clue/commander",
-            "version": "v1.2.2",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-commander.git",
-                "reference": "b19c3b5099fa765f03aa049851f3ea35df2b5807"
+                "reference": "8caf2f5e302045ac70bde7f748ab95730946e974"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-commander/zipball/b19c3b5099fa765f03aa049851f3ea35df2b5807",
-                "reference": "b19c3b5099fa765f03aa049851f3ea35df2b5807",
+                "url": "https://api.github.com/repos/clue/php-commander/zipball/8caf2f5e302045ac70bde7f748ab95730946e974",
+                "reference": "8caf2f5e302045ac70bde7f748ab95730946e974",
                 "shasum": ""
             },
             "require": {
@@ -55,7 +55,7 @@
                 "parse",
                 "router"
             ],
-            "time": "2017-06-29T20:17:23+00:00"
+            "time": "2017-08-11T09:27:21+00:00"
         },
         {
             "name": "clue/connection-manager-extra",

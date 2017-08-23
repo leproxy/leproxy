@@ -87,6 +87,42 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testCoerceBlockUri()
+    {
+        $uris = array(
+            'hostname' => 'hostname',
+            '127.0.0.1:1234' => '127.0.0.1:1234',
+            '127.0.0.1' => '127.0.0.1',
+            '*:1234' => '*:1234',
+            ':1234' => '*:1234',
+        );
+
+        foreach ($uris as $in => $out) {
+            $this->assertEquals($out, ConnectorFactory::coerceBlockUri($in));
+        }
+    }
+
+    public function testCoerceBlockUriInvalidThrows()
+    {
+        $uris = array(
+            'invalid port' => '127.0.0.1:port',
+            'excessive scheme' => 'http://127.0.0.1:8080',
+            'excessive path' => '127.0.0.1:8080/root',
+            'excessive query' => '127.0.0.1:8080?query',
+            'excessive fragment' => '127.0.0.1:8080#fragment',
+        );
+
+        foreach ($uris as $uri) {
+            try {
+                ConnectorFactory::coerceBlockUri($uri);
+                $this->fail();
+            } catch (InvalidArgumentException $e) {
+                $this->assertTrue(true);
+            }
+        }
+    }
+
+
     public function testIsIpLocal()
     {
         $ips = array(
