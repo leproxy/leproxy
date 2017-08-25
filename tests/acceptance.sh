@@ -21,6 +21,10 @@ killall php 2>&- 1>&- || true
 php $bin 127.0.0.1:8180 --no-log &
 sleep 2
 
+out=$(curl -v --head --silent --fail http://localhost:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://127.0.0.1:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy http://localhost:8180 http://localhost:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 --location http://github.com 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks5://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
