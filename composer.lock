@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e862c8337299fd6312cafc5ec45698ea",
+    "content-hash": "9a1a89252984a108969d4c80e99dacc0",
     "packages": [
         {
             "name": "clue/commander",
@@ -421,16 +421,16 @@
         },
         {
             "name": "react/dns",
-            "version": "v0.4.10",
+            "version": "v0.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/dns.git",
-                "reference": "457fbc43c04e9612573a24245d950c091c0fc40e"
+                "reference": "8558bba4f2784aa997670d15fc6f7461a8eb4e53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/dns/zipball/457fbc43c04e9612573a24245d950c091c0fc40e",
-                "reference": "457fbc43c04e9612573a24245d950c091c0fc40e",
+                "url": "https://api.github.com/repos/reactphp/dns/zipball/8558bba4f2784aa997670d15fc6f7461a8eb4e53",
+                "reference": "8558bba4f2784aa997670d15fc6f7461a8eb4e53",
                 "shasum": ""
             },
             "require": {
@@ -463,7 +463,7 @@
                 "dns-resolver",
                 "reactphp"
             ],
-            "time": "2017-08-10T12:31:41+00:00"
+            "time": "2017-08-25T08:22:48+00:00"
         },
         {
             "name": "react/event-loop",
@@ -699,23 +699,23 @@
         },
         {
             "name": "react/socket",
-            "version": "v0.8.0",
+            "version": "v0.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "8f880ab1a9e1b2eb236a836aa5e1326da3647bcd"
+                "reference": "ee817e348abcf35c55b448a5cd3ef4eec88379e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/8f880ab1a9e1b2eb236a836aa5e1326da3647bcd",
-                "reference": "8f880ab1a9e1b2eb236a836aa5e1326da3647bcd",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/ee817e348abcf35c55b448a5cd3ef4eec88379e9",
+                "reference": "ee817e348abcf35c55b448a5cd3ef4eec88379e9",
                 "shasum": ""
             },
             "require": {
-                "evenement/evenement": "~2.0|~1.0",
+                "evenement/evenement": "^3.0 || ^2.0 || ^1.0",
                 "php": ">=5.3.0",
-                "react/dns": "0.4.*|0.3.*",
-                "react/event-loop": "0.4.*|0.3.*",
+                "react/dns": "^0.4.11",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3.5",
                 "react/promise": "^2.1 || ^1.2",
                 "react/promise-timer": "~1.0",
                 "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.5"
@@ -743,7 +743,7 @@
                 "reactphp",
                 "stream"
             ],
-            "time": "2017-05-09T11:27:38+00:00"
+            "time": "2017-08-25T09:08:33+00:00"
         },
         {
             "name": "react/stream",
