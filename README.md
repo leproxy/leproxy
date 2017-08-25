@@ -112,6 +112,27 @@ $ php leproxy.php --block=youtube.com --block=*:80
   Make sure to configure your client to use remote DNS resolution accordingly
   and/or also block access to relevant IP addresses.
 
+As an alternative to listing each blocked destination as an individual command
+line argument, you may also pass a path to a `hosts` file instead.
+You can either create a hosts file mapping yourself if you only want to block
+certain hosts or you may one of the many great hosts files.
+For example, you can download a hosts file from https://github.com/StevenBlack/hosts
+("hosts files from several well-curated sources like adaway.org, mvps.org,
+malwaredomainlist.com, someonewhocares.org, and potentially others")
+to use this as a very simple, yet effective adblocker.
+Note that LeProxy will only block domains (and all its subdomains) that match
+the IP `0.0.0.0` and ignore all other entries:
+
+```bash
+$ cat hosts.txt
+127.0.0.1 localhost
+0.0.0.0 ads.example.com
+0.0.0.0 socialnetwork.example
+…
+
+$ php leproxy.php --block-hosts=hosts.txt
+```
+
 By default, Leproxy creates a direct connection to the destination address for
 each incoming proxy request.
 In this mode, the destination doesn't see the original client address, but only

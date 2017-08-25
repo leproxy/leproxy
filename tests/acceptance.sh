@@ -77,6 +77,15 @@ out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 https://ww
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://google.de 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks5h://127.0.0.1:8180 https://google.de 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
+# restart LeProxy with hosts file and plain HTTP port blocked
+killall php 2>&- 1>&- || true
+php $bin 127.0.0.1:8180 --block-hosts=tests/hosts-google --no-log &
+sleep 2
+
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://google.com 2>&1) && echo "FAIL: $out" && exit 1 || (echo "$out" | grep -q "403 Forbidden" && echo OK) || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://maps.google.com 2>&1) && echo "FAIL: $out" && exit 1 || (echo "$out" | grep -q "403 Forbidden" && echo OK) || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://google.de 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+
 # restart LeProxy with authentication required
 killall php 2>&- 1>&- || true
 php $bin user:pass@127.0.0.1:8180 --no-log &

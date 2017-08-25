@@ -18,6 +18,7 @@ use Clue\Commander\Router;
 use Clue\Commander\NoRouteFoundException;
 use Clue\Commander\Tokens\Tokenizer;
 use React\EventLoop\Factory;
+use React\Dns\Config\HostsFile;
 
 if (PHP_VERSION_ID < 50400 || PHP_SAPI !== 'cli') {
     echo 'LeProxy HTTP/SOCKS proxy requires running ' . (PHP_SAPI !== 'cli' ? ('via command line (not ' . PHP_SAPI . ')') : ('on PHP 5.4+ (is ' . PHP_VERSION . ')')) . PHP_EOL;
@@ -40,6 +41,10 @@ $tokenizer->addFilter('proxy', function (&$value) {
     $value = ConnectorFactory::coerceProxyUri($value);
     return true;
 });
+$tokenizer->addFilter('hosts', function (&$value) {
+    $value = HostsFile::loadFromPathBlocking($value)->getHostsForIp('0.0.0.0');
+    return true;
+});
 $commander = new Router($tokenizer);
 $commander->add('--version', function () {
     exit('LeProxy development version ' . VERSION . PHP_EOL);
@@ -48,7 +53,7 @@ $commander->add('-h | --help', function () {
     exit('LeProxy HTTP/SOCKS proxy
 
 Usage:
-    $ php leproxy.php [<listenAddress>] [--allow-unprotected] [--block=<destination>...] [--proxy=<upstreamProxy>...] [--no-log]
+    $ php leproxy.php [<listenAddress>] [--allow-unprotected] [--block=<destination>...] [--block-hosts=<path>...] [--proxy=<upstreamProxy>...] [--no-log]
     $ php leproxy.php --version
     $ php leproxy.php --help
 
@@ -78,6 +83,11 @@ Arguments:
         Each destination address can be in the form `host` or `host:port` and
         `host` may contain the `*` wildcard to match anything.
         Subdomains for each host will automatically be blocked.
+
+    --block-hosts=<path>
+        Loads the hosts file from the given file path and blocks all of the
+        hostnames (and subdomains) that match the IP `0.0.0.0`.
+        Any number of hosts files can be given, all hosts will be blocked.
 
     --proxy=<upstreamProxy>
         An upstream proxy server where each connection request will be
@@ -116,13 +126,22 @@ Examples:
         an upstream proxy server that requires authentication.
 ');
 });
-$commander->add('[--allow-unprotected] [--block=<block:block>...] [--proxy=<proxy:proxy>...] [--no-log] [<listen>]', function ($args) {
+$commander->add('[--allow-unprotected] [--block=<block:block>...] [--block-hosts=<file:hosts>...] [--proxy=<proxy:proxy>...] [--no-log] [<listen>]', function ($args) {
     // validate listening URI or assume default URI
     $args['listen'] = ConnectorFactory::coerceListenUri(isset($args['listen']) ? $args['listen'] : '');
 
     $args['allow-unprotected'] = isset($args['allow-unprotected']);
     if ($args['allow-unprotected'] && strpos($args['listen'], '@') !== false) {
         throw new \InvalidArgumentException('Unprotected mode can not be used with authentication required');
+    }
+
+    if (isset($args['block-hosts'])) {
+        if (!isset($args['block'])) {
+            $args['block'] = array();
+        }
+        foreach ($args['block-hosts'] as $hosts) {
+            $args['block'] += $hosts;
+        }
     }
 
     return $args;
@@ -146,7 +165,7 @@ $loop = Factory::create();
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain(isset($args['proxy']) ? $args['proxy'] : array(), $loop);
 
-// block certain hosts if `--block=` has been given
+// block certain hosts if `--block=` or `--block-host=` has been given
 if (isset($args['block'])) {
     $connector = ConnectorFactory::createBlockingConnector($args['block'], $connector);
 }
