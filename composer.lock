@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9a1a89252984a108969d4c80e99dacc0",
+    "content-hash": "d0f5584c52ec53258f63f525a75e6ab7",
     "packages": [
         {
             "name": "clue/commander",
@@ -558,25 +558,25 @@
         },
         {
             "name": "react/http-client",
-            "version": "v0.5.2",
+            "version": "v0.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http-client.git",
-                "reference": "2a62a9cf1d1dde36ecc443a59e57c28afc79e713"
+                "reference": "e11eef9c82595a42a8523252bafe4bb5cbfb306d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http-client/zipball/2a62a9cf1d1dde36ecc443a59e57c28afc79e713",
-                "reference": "2a62a9cf1d1dde36ecc443a59e57c28afc79e713",
+                "url": "https://api.github.com/repos/reactphp/http-client/zipball/e11eef9c82595a42a8523252bafe4bb5cbfb306d",
+                "reference": "e11eef9c82595a42a8523252bafe4bb5cbfb306d",
                 "shasum": ""
             },
             "require": {
-                "evenement/evenement": "~2.0",
+                "evenement/evenement": "^3.0 || ^2.0",
                 "guzzlehttp/psr7": "^1.0",
                 "php": ">=5.4.0",
                 "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3",
                 "react/promise": "~2.2",
-                "react/socket": "^1.0 || ^0.8 || ^0.7",
+                "react/socket": "^1.0 || ^0.8.2",
                 "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.2"
             },
             "require-dev": {
@@ -596,7 +596,7 @@
             "keywords": [
                 "http"
             ],
-            "time": "2017-06-27T06:45:28+00:00"
+            "time": "2017-08-25T12:20:26+00:00"
         },
         {
             "name": "react/promise",
