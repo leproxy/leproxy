@@ -214,4 +214,27 @@ class ConnectorFactory
 
         return new ConnectionManagerSelective($filter);
     }
+
+    /**
+     * Filters all domains to exclude duplicates and subdomains that also contain a main domain
+     *
+     * @param array $domains
+     * @return array
+     */
+    public static function filterRootDomains($domains)
+    {
+        $keep = array_fill_keys($domains, true);
+        foreach ($domains as $domain) {
+            $search = $domain;
+            while (($pos = strpos($search, '.')) !== false) {
+                $search = substr($search, $pos + 1);
+                if (isset($keep[$search])) {
+                    unset($keep[$domain]);
+                    break;
+                }
+            }
+        }
+
+        return array_keys($keep);
+    }
 }

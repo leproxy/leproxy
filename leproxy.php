@@ -144,6 +144,11 @@ $commander->add('[--allow-unprotected] [--block=<block:block>...] [--block-hosts
         }
     }
 
+    // filter duplicate block entries and subdomains
+    if (isset($args['block'])) {
+        $args['block'] = ConnectorFactory::filterRootDomains($args['block']);
+    }
+
     return $args;
 });
 try {
@@ -165,7 +170,6 @@ $loop = Factory::create();
 // set next proxy server chain -> p1 -> p2 -> p3 -> destination
 $connector = ConnectorFactory::createConnectorChain(isset($args['proxy']) ? $args['proxy'] : array(), $loop);
 
-// block certain hosts if `--block=` or `--block-host=` has been given
 if (isset($args['block'])) {
     $connector = ConnectorFactory::createBlockingConnector($args['block'], $connector);
 }
@@ -199,6 +203,10 @@ echo ')' . PHP_EOL;
 
 if (isset($args['proxy'])) {
     echo 'Forwarding via: ' . implode(' -> ', $args['proxy']) . PHP_EOL;
+}
+
+if (isset($args['block'])) {
+    echo 'Blocking a total of ' . count($args['block']) . ' destination(s)' . PHP_EOL;
 }
 
 $loop->run();

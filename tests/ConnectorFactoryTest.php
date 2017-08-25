@@ -240,6 +240,13 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
         $connector->connect('tls://google.com:443');
     }
 
+    public function testFilterRootDomains()
+    {
+        $domains = array('www.google.com', 'google.com', 'deep.example.google.com');
+
+        $this->assertEquals(array('google.com'), ConnectorFactory::filterRootDomains($domains));
+    }
+
     private function assertPromiseRejected($input)
     {
         $this->assertInstanceOf('React\Promise\PromiseInterface', $input);
