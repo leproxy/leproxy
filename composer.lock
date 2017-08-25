@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d0f5584c52ec53258f63f525a75e6ab7",
+    "content-hash": "021725accbfe715330c0217415338662",
     "packages": [
         {
             "name": "clue/commander",
@@ -59,16 +59,16 @@
         },
         {
             "name": "clue/connection-manager-extra",
-            "version": "v1.0.1",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-connection-manager-extra.git",
-                "reference": "8b73b8a694311589fd09f34b88a6a9003ceb7e6d"
+                "reference": "ecd9f674ab389491247adcbd9e5ced7627ef5eec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-connection-manager-extra/zipball/8b73b8a694311589fd09f34b88a6a9003ceb7e6d",
-                "reference": "8b73b8a694311589fd09f34b88a6a9003ceb7e6d",
+                "url": "https://api.github.com/repos/clue/php-connection-manager-extra/zipball/ecd9f674ab389491247adcbd9e5ced7627ef5eec",
+                "reference": "ecd9f674ab389491247adcbd9e5ced7627ef5eec",
                 "shasum": ""
             },
             "require": {
@@ -113,7 +113,7 @@
                 "retry",
                 "timeout"
             ],
-            "time": "2017-06-23T10:30:30+00:00"
+            "time": "2017-08-03T11:10:21+00:00"
         },
         {
             "name": "clue/http-proxy-react",

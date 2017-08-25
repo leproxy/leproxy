@@ -13,6 +13,7 @@ use React\Socket\ConnectorInterface;
 use React\Socket\ServerInterface;
 use Exception;
 use React\Stream\ReadableStreamInterface;
+use React\Promise\Timer\TimeoutException;
 
 class HttpProxyServer
 {
@@ -158,9 +159,9 @@ class HttpProxyServer
                     $remote
                 );
             },
-            function ($e) {
+            function (\Exception $e) {
                 return new Response(
-                    502,
+                    $this->getCode($e),
                     array(
                         'Content-Type' => 'text/plain'
                     ) + $this->headers,
@@ -230,18 +231,17 @@ class HttpProxyServer
         });
 
         $outgoing->on('error', function (Exception $e) use ($deferred) {
-            $message = '';
-            while ($e !== null) {
-                $message .= $e->getMessage() . "\n";
+            // HttpClient wraps this in another exception by default which we do not need
+            if ($e->getPrevious() !== null) {
                 $e = $e->getPrevious();
             }
 
             $deferred->resolve(new Response(
-                502,
+                $this->getCode($e),
                 array(
                     'Content-Type' => 'text/plain'
                 ) + $this->headers,
-                'Unable to request: ' . $message
+                'Unable to request: ' . $e->getMessage()
             ));
         });
 
@@ -293,5 +293,25 @@ function FindProxyForURL(url, host) {
 
 EOF
 );
+    }
+
+    /**
+     * Returns an appropriate HTTP status code for the given Exception
+     *
+     * @param \Exception $e
+     * @return int
+     */
+    private function getCode(\Exception $e)
+    {
+        if ((defined('SOCKET_EACCES') && $e->getCode() === SOCKET_EACCES) || $e->getCode() === 13) {
+            // map EACCES (permission denied) to 403 (Forbidden), used for block list
+            return 403; // Forbidden
+        } elseif ((defined('SOCKET_ETIMEDOUT') && $e->getCode() === SOCKET_ETIMEDOUT) || $e->getCode() === 110 || $e instanceof TimeoutException) {
+            // Socket doesn't currently assign error code, but we can rely on TimeoutException here.
+            // map ETIMEDOUT (timed out) to 504 (Gateway timeout)
+            return 504; // Gateway Timeout
+        }
+
+        return 502; // Bad Gateway
     }
 }

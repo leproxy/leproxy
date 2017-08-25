@@ -183,7 +183,9 @@ class ConnectorFactory
      */
     public static function createBlockingConnector(array $block, ConnectorInterface $base)
     {
-        $reject = new ConnectionManagerReject();
+        $reject = new ConnectionManagerReject(function () {
+            throw new \RuntimeException('Connection blocked (EACCES)', defined('SOCKET_EACCES') ? SOCKET_EACCES : 13);
+        });
 
         // reject all hosts given in the block list
         $filter = array();
