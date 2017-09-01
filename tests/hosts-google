@@ -1,0 +1,6 @@
+# ignore localhost mapping
+127.0.0.1 localhost
+
+# block google.com
+0.0.0.0 www.google.com
+0.0.0.0 google.com
