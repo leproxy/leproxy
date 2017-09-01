@@ -5,6 +5,8 @@ use React\Http\ServerRequest;
 use React\Http\HttpBodyStream;
 use React\Stream\ThroughStream;
 use React\Promise\Promise;
+use LeProxy\LeProxy\ConnectorFactory;
+use React\Promise\Timer\TimeoutException;
 
 class HttpProxyServerTest extends PHPUnit_Framework_TestCase
 {
@@ -138,7 +140,7 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
         $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
 
-        $promise = \React\Promise\reject(new RuntimeException('', SOCKET_EACCES));
+        $promise = \React\Promise\reject(new RuntimeException('', ConnectorFactory::CODE_BLOCKED));
 
         $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
         $connector->expects($this->once())->method('connect')->willReturn($promise);
@@ -164,7 +166,7 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
         $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
 
-        $promise = \React\Promise\reject(new RuntimeException('', SOCKET_ETIMEDOUT));
+        $promise = \React\Promise\reject(new TimeoutException(0.0));
 
         $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
         $connector->expects($this->once())->method('connect')->willReturn($promise);

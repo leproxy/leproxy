@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "021725accbfe715330c0217415338662",
+    "content-hash": "3e95e04e74e6c96f901cd346aaeccbf8",
     "packages": [
         {
             "name": "clue/commander",
@@ -117,16 +117,16 @@
         },
         {
             "name": "clue/http-proxy-react",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-http-proxy-react.git",
-                "reference": "c50c72b88e4bc111421c9ab05e7ce19b3943fadb"
+                "reference": "06bc84cda43c724edc5b5a19f61452e8094ba99d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-http-proxy-react/zipball/c50c72b88e4bc111421c9ab05e7ce19b3943fadb",
-                "reference": "c50c72b88e4bc111421c9ab05e7ce19b3943fadb",
+                "url": "https://api.github.com/repos/clue/php-http-proxy-react/zipball/06bc84cda43c724edc5b5a19f61452e8094ba99d",
+                "reference": "06bc84cda43c724edc5b5a19f61452e8094ba99d",
                 "shasum": ""
             },
             "require": {
@@ -165,20 +165,20 @@
                 "proxy",
                 "reactphp"
             ],
-            "time": "2017-06-11T11:09:42+00:00"
+            "time": "2017-08-30T06:47:01+00:00"
         },
         {
             "name": "clue/socks-react",
-            "version": "v0.8.4",
+            "version": "v0.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-socks-react.git",
-                "reference": "7a6eea83478d291100003584755be9d2a877ed24"
+                "reference": "00f7f16c2aceedd144b08a19a1414564c8e99d2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/7a6eea83478d291100003584755be9d2a877ed24",
-                "reference": "7a6eea83478d291100003584755be9d2a877ed24",
+                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/00f7f16c2aceedd144b08a19a1414564c8e99d2d",
+                "reference": "00f7f16c2aceedd144b08a19a1414564c8e99d2d",
                 "shasum": ""
             },
             "require": {
@@ -220,7 +220,7 @@
                 "socks server",
                 "tcp tunnel"
             ],
-            "time": "2017-07-27T07:44:09+00:00"
+            "time": "2017-09-01T10:37:29+00:00"
         },
         {
             "name": "evenement/evenement",

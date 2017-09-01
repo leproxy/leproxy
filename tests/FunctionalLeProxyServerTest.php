@@ -11,6 +11,7 @@ use React\Socket\ConnectionInterface;
 use Clue\React\Block;
 use React\Promise\Stream;
 use RingCentral\Psr7;
+use LeProxy\LeProxy\ConnectorFactory;
 
 class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 {
@@ -44,6 +45,8 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $this->proxy = $this->socketProxy->getAddress();
     }
+
+    //private function setConnector()
 
     public function tearDown()
     {
@@ -268,6 +271,54 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $this->assertStringStartsWith("HTTP/1.1 407 Proxy Authentication Required\r\n", $response);
         $this->assertContains("Server: LeProxy\r\n", $response);
+    }
+
+    public function testSocksGet()
+    {
+        // connect to proxy and send CONNECT requets and then normal request
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("\x05\x01\x00" . "\x05\x01\x00\x03\x09" . "localhost" . "\x1F\x92");
+
+            $conn->once('data', function () use ($conn) {
+                $conn->once('data', function () use ($conn) {
+                    $conn->write("GET / HTTP/1.1\r\n\r\n");
+                });
+            });
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.2);
+
+        $this->assertStringStartsWith("\x05\x00" . "\x05\x00\x00\x01\x00\x00\x00\x00\x00\x00", $response);
+        $this->assertContains("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
+    }
+
+    public function testSocksBlockedWillReturnRulesetError()
+    {
+        $base = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $base->expects($this->never())->method('connect');
+
+        $blocker = ConnectorFactory::createBlockingConnector(array('*'), $base);
+
+        $this->socketProxy->close();
+        $proxy = new LeProxyServer($this->loop, $blocker);
+        $this->socketProxy = $proxy->listen('127.0.0.1:8084', false);
+        $this->proxy = $this->socketProxy->getAddress();
+
+        // connect to proxy and send CONNECT requets and then normal request
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("\x05\x01\x00" . "\x05\x01\x00\x03\x09" . "localhost" . "\x1F\x92");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.2);
+
+        $this->assertEquals("\x05\x00" . "\x05\x02\x00\x01\x00\x00\x00\x00\x00\x00", $response);
     }
 
     public function testPacDirect()

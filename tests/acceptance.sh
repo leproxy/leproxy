@@ -106,5 +106,12 @@ sleep 2
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8182 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8182 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
+# start another LeProxy instance for invalid HTTP proxy chaining / nesting
+php $bin 127.0.0.1:8183 --proxy=http://user:invalid@127.0.0.1:8180 --no-log &
+sleep 2
+
+# client does not need authentication because first chain passes to next via HTTP
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8183 https://youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || (echo "$out" | grep -q "502 Bad Gateway" && echo OK) || (echo "FAIL: $out" && exit 1) || exit 1
+
 killall php 2>&- 1>&- || true
 echo DONE

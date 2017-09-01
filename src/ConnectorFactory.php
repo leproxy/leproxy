@@ -12,6 +12,8 @@ use ConnectionManager\Extra\Multiple\ConnectionManagerSelective;
 
 class ConnectorFactory
 {
+    const CODE_BLOCKED = 4711;
+
     /**
      * Parses the given proxy URI and adds default scheme and port or throws on error
      *
@@ -191,7 +193,7 @@ class ConnectorFactory
     public static function createBlockingConnector(array $block, ConnectorInterface $base)
     {
         $reject = new ConnectionManagerReject(function () {
-            throw new \RuntimeException('Connection blocked (EACCES)', defined('SOCKET_EACCES') ? SOCKET_EACCES : 13);
+            throw new \RuntimeException('Connection blocked', self::CODE_BLOCKED);
         });
 
         // reject all hosts given in the block list
