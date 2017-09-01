@@ -5,6 +5,8 @@ use React\Http\ServerRequest;
 use React\Http\HttpBodyStream;
 use React\Stream\ThroughStream;
 use React\Promise\Promise;
+use LeProxy\LeProxy\ConnectorFactory;
+use React\Promise\Timer\TimeoutException;
 
 class HttpProxyServerTest extends PHPUnit_Framework_TestCase
 {
@@ -131,6 +133,58 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
         $response = $server->handleRequest($request);
 
         $this->assertInstanceOf('React\Promise\PromiseInterface', $response);
+    }
+
+    public function testRequestConnectCallsConnectorBlockedReturnsForbidden()
+    {
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
+
+        $promise = \React\Promise\reject(new RuntimeException('', ConnectorFactory::CODE_BLOCKED));
+
+        $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $connector->expects($this->once())->method('connect')->willReturn($promise);
+
+        $server = new HttpProxyServer($loop, $socket, $connector);
+
+        $request = new ServerRequest('CONNECT', 'http://example.com', array(), null, '1.1', array('REMOTE_ADDR' => '192.168.1.1', 'REMOTE_PORT' => 5060));
+        $request = $request->withRequestTarget('example.com:80');
+
+        $promise = $server->handleRequest($request);
+
+        $response = null;
+        $promise->then(function ($ret) use (&$response) {
+            $response = $ret;
+        });
+
+        $this->assertNotNull($response);
+        $this->assertEquals(403, $response->getStatusCode());
+    }
+
+    public function testRequestConnectCallsConnectorTimeoutReturnsGatewayTimeout()
+    {
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
+
+        $promise = \React\Promise\reject(new TimeoutException(0.0));
+
+        $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $connector->expects($this->once())->method('connect')->willReturn($promise);
+
+        $server = new HttpProxyServer($loop, $socket, $connector);
+
+        $request = new ServerRequest('CONNECT', 'http://example.com', array(), null, '1.1', array('REMOTE_ADDR' => '192.168.1.1', 'REMOTE_PORT' => 5060));
+        $request = $request->withRequestTarget('example.com:80');
+
+        $promise = $server->handleRequest($request);
+
+        $response = null;
+        $promise->then(function ($ret) use (&$response) {
+            $response = $ret;
+        });
+
+        $this->assertNotNull($response);
+        $this->assertEquals(504, $response->getStatusCode());
     }
 
     public function testRequestAbsoluteCallsConnector()

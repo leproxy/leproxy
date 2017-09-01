@@ -12,6 +12,8 @@ use ConnectionManager\Extra\Multiple\ConnectionManagerSelective;
 
 class ConnectorFactory
 {
+    const CODE_BLOCKED = 4711;
+
     /**
      * Parses the given proxy URI and adds default scheme and port or throws on error
      *
@@ -131,7 +133,10 @@ class ConnectorFactory
      */
     public static function createConnectorChain(array $path, LoopInterface $loop)
     {
-        $connector = new Connector($loop);
+        // root connector is used to connect to proxies, timeout is only applied to complete chain below
+        $connector = new Connector($loop, array(
+            'timeout' => false
+        ));
 
         foreach ($path as $proxy) {
             if (strpos($proxy, '://') === false || strpos($proxy, 'http://') === 0) {
@@ -141,7 +146,11 @@ class ConnectorFactory
             }
         }
 
-        return $connector;
+        // return wrapping connector which applies default timeout (and remote DNS resolution) to complete chain
+        return new Connector($loop, array(
+            'tcp' => $connector,
+            'dns' => false
+        ));
     }
 
     /**
@@ -183,7 +192,9 @@ class ConnectorFactory
      */
     public static function createBlockingConnector(array $block, ConnectorInterface $base)
     {
-        $reject = new ConnectionManagerReject();
+        $reject = new ConnectionManagerReject(function () {
+            throw new \RuntimeException('Connection blocked', self::CODE_BLOCKED);
+        });
 
         // reject all hosts given in the block list
         $filter = array();

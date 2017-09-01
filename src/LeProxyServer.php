@@ -56,7 +56,7 @@ class LeProxyServer
         // start new proxy server which uses the given connector for forwarding/chaining
         $unification = new ProtocolDetector($socket);
         $http = new HttpProxyServer($this->loop, $unification->http, $this->connector);
-        $socks = new SocksServer($this->loop, $unification->socks, $this->connector);
+        $socks = new SocksServer($this->loop, $unification->socks, new SocksErrorConnector($this->connector));
 
         // require authentication if listening URI contains username/password
         if (isset($parts['user']) || isset($parts['pass'])) {

@@ -13,6 +13,7 @@ use React\Socket\ConnectorInterface;
 use React\Socket\ServerInterface;
 use Exception;
 use React\Stream\ReadableStreamInterface;
+use React\Promise\Timer\TimeoutException;
 
 class HttpProxyServer
 {
@@ -158,13 +159,13 @@ class HttpProxyServer
                     $remote
                 );
             },
-            function ($e) {
+            function (\Exception $e) {
                 return new Response(
-                    502,
+                    $this->getCode($e),
                     array(
                         'Content-Type' => 'text/plain'
                     ) + $this->headers,
-                    'Unable to connect: ' . $e->getMessage()
+                    'Unable to connect: ' . $this->getMessage($e)
                 );
             }
         );
@@ -230,18 +231,12 @@ class HttpProxyServer
         });
 
         $outgoing->on('error', function (Exception $e) use ($deferred) {
-            $message = '';
-            while ($e !== null) {
-                $message .= $e->getMessage() . "\n";
-                $e = $e->getPrevious();
-            }
-
             $deferred->resolve(new Response(
-                502,
+                $this->getCode($e),
                 array(
                     'Content-Type' => 'text/plain'
                 ) + $this->headers,
-                'Unable to request: ' . $message
+                'Unable to request: ' . $this->getMessage($e)
             ));
         });
 
@@ -293,5 +288,44 @@ function FindProxyForURL(url, host) {
 
 EOF
 );
+    }
+
+    /**
+     * Returns an appropriate HTTP status code for the given Exception
+     *
+     * @param \Exception $e
+     * @return int
+     */
+    private function getCode(\Exception $e)
+    {
+        if ($e->getCode() === ConnectorFactory::CODE_BLOCKED) {
+            // Only map our block list to 403 (Forbidden)
+            // Upstream proxy servers may return EACCESS (permission denied), but this
+            // is a server-side issue and not to be reported as an auth issue to the client
+            return 403;
+        } elseif ($e instanceof TimeoutException) {
+            // Only map our own TimeoutEception to 504 (Gateway Timeout)
+            // Upstream proxy servers may return ETIMDOUT (timed out), but this
+            // is a server-side issue and not to be reported as a timeout issue to the client
+            return 504;
+        }
+
+        return 502; // Bad Gateway
+    }
+
+    /**
+     * Returns the exception message and all its previous exceptions concatenated
+     *
+     * @param Exception $e
+     * @return string
+     */
+    private function getMessage(Exception $e)
+    {
+        $message = '';
+        while ($e !== null) {
+            $message .= $e->getMessage() . "\n";
+            $e = $e->getPrevious();
+        }
+        return $message;
     }
 }
