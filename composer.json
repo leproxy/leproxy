@@ -25,7 +25,7 @@
     "require-dev": {
         "clue/block-react": "^1.1",
         "phpunit/phpunit": "^4.8",
-        "react/promise-stream": "^0.1.1"
+        "react/promise-stream": "^1.0 || ^0.1.1"
     },
     "bin": [
         "leproxy.php"
