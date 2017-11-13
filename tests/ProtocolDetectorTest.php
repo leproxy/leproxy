@@ -3,8 +3,9 @@
 use LeProxy\LeProxy\ProtocolDetector;
 use React\Socket\Server;
 use React\Socket\ConnectionInterface;
+use PHPUnit\Framework\TestCase;
 
-class ProtocolDetectorTest extends PHPUnit_Framework_TestCase
+class ProtocolDetectorTest extends TestCase
 {
     public function testCtor()
     {

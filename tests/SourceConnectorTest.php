@@ -1,8 +1,9 @@
 <?php
 
 use LeProxy\LeProxy\SourceConnector;
+use PHPUnit\Framework\TestCase;
 
-class SourceConnectorTest extends PHPUnit_Framework_TestCase
+class SourceConnectorTest extends TestCase
 {
     public function testConnnectAppendsSource()
     {

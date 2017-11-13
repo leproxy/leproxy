@@ -2,8 +2,9 @@
 
 use LeProxy\LeProxy\LeProxyServer;
 use React\EventLoop\Factory;
+use PHPUnit\Framework\TestCase;
 
-class LeProxyServerTest extends PHPUnit_Framework_TestCase
+class LeProxyServerTest extends TestCase
 {
     /** @expectedException InvalidArgumentException */
     public function testInvalidListenUriThrows()

@@ -1,8 +1,9 @@
 <?php
 
 use LeProxy\LeProxy\ConnectorFactory;
+use PHPUnit\Framework\TestCase;
 
-class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
+class ConnectorFactoryTest extends TestCase
 {
     public function testCoerceProxyUri()
     {

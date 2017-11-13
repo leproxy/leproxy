@@ -2,8 +2,9 @@
 
 use LeProxy\LeProxy\LoggingConnector;
 use React\Promise;
+use PHPUnit\Framework\TestCase;
 
-class LoggingConnectorTest extends PHPUnit_Framework_TestCase
+class LoggingConnectorTest extends TestCase
 {
     public function testConnectPendingDoesNotPrintAnything()
     {
