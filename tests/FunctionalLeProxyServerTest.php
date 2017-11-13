@@ -12,8 +12,9 @@ use Clue\React\Block;
 use React\Promise\Stream;
 use RingCentral\Psr7;
 use LeProxy\LeProxy\ConnectorFactory;
+use PHPUnit\Framework\TestCase;
 
-class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
+class FunctionalLeProxyServerTest extends TestCase
 {
     private $loop;
     private $socketProxy;

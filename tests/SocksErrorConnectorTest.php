@@ -3,8 +3,9 @@
 use LeProxy\LeProxy\SocksErrorConnector;
 use React\Promise\Promise;
 use LeProxy\LeProxy\ConnectorFactory;
+use PHPUnit\Framework\TestCase;
 
-class SocksErrorConnectorTest extends PHPUnit_Framework_TestCase
+class SocksErrorConnectorTest extends TestCase
 {
     public function testConnectWillBePassedThrough()
     {

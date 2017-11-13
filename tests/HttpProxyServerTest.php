@@ -7,8 +7,9 @@ use React\Stream\ThroughStream;
 use React\Promise\Promise;
 use LeProxy\LeProxy\ConnectorFactory;
 use React\Promise\Timer\TimeoutException;
+use PHPUnit\Framework\TestCase;
 
-class HttpProxyServerTest extends PHPUnit_Framework_TestCase
+class HttpProxyServerTest extends TestCase
 {
     public function testCtor()
     {
