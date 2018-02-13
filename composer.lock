@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "55bf6508d41eccf6f13129692a47ffab",
+    "content-hash": "3074fb344e97a593fd45c93a5a67f41f",
     "packages": [
         {
             "name": "clue/commander",
@@ -271,71 +271,6 @@
             "time": "2017-07-17T17:39:19+00:00"
         },
         {
-            "name": "guzzlehttp/psr7",
-            "version": "1.4.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/psr7.git",
-                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
-                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0",
-                "psr/http-message": "~1.0"
-            },
-            "provide": {
-                "psr/http-message-implementation": "1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.4-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GuzzleHttp\\Psr7\\": "src/"
-                },
-                "files": [
-                    "src/functions_include.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
-                },
-                {
-                    "name": "Tobias Schultze",
-                    "homepage": "https://github.com/Tobion"
-                }
-            ],
-            "description": "PSR-7 message implementation that also provides common utility methods",
-            "keywords": [
-                "http",
-                "message",
-                "request",
-                "response",
-                "stream",
-                "uri",
-                "url"
-            ],
-            "time": "2017-03-20T17:10:46+00:00"
-        },
-        {
             "name": "psr/http-message",
             "version": "1.0.1",
             "source": {
@@ -562,26 +497,26 @@
         },
         {
             "name": "react/http-client",
-            "version": "v0.5.7",
+            "version": "v0.5.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http-client.git",
-                "reference": "a0f6814c385523a34773a6f1b2f620d390e579d5"
+                "reference": "7dd490916b07e7402b7143e1ad6803fdb50c5e98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http-client/zipball/a0f6814c385523a34773a6f1b2f620d390e579d5",
-                "reference": "a0f6814c385523a34773a6f1b2f620d390e579d5",
+                "url": "https://api.github.com/repos/reactphp/http-client/zipball/7dd490916b07e7402b7143e1ad6803fdb50c5e98",
+                "reference": "7dd490916b07e7402b7143e1ad6803fdb50c5e98",
                 "shasum": ""
             },
             "require": {
-                "evenement/evenement": "^3.0 || ^2.0",
-                "guzzlehttp/psr7": "^1.0",
-                "php": ">=5.4.0",
+                "evenement/evenement": "^3.0 || ^2.0 || ^1.0",
+                "php": ">=5.3.0",
                 "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3",
-                "react/promise": "~2.2",
+                "react/promise": "^2.1 || ^1.2.1",
                 "react/socket": "^1.0 || ^0.8.4",
-                "react/stream": "^1.0 || ^0.7.1"
+                "react/stream": "^1.0 || ^0.7.1",
+                "ringcentral/psr7": "^1.2"
             },
             "require-dev": {
                 "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
@@ -600,7 +535,7 @@
             "keywords": [
                 "http"
             ],
-            "time": "2018-02-08T11:18:52+00:00"
+            "time": "2018-02-09T08:42:44+00:00"
         },
         {
             "name": "react/promise",
