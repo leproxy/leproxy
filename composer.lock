@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7cbaf1d3efffddd09ec96f2b3f8c1ca7",
+    "content-hash": "55bf6508d41eccf6f13129692a47ffab",
     "packages": [
         {
             "name": "clue/commander",
@@ -562,16 +562,16 @@
         },
         {
             "name": "react/http-client",
-            "version": "v0.5.4",
+            "version": "v0.5.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http-client.git",
-                "reference": "e11eef9c82595a42a8523252bafe4bb5cbfb306d"
+                "reference": "a0f6814c385523a34773a6f1b2f620d390e579d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http-client/zipball/e11eef9c82595a42a8523252bafe4bb5cbfb306d",
-                "reference": "e11eef9c82595a42a8523252bafe4bb5cbfb306d",
+                "url": "https://api.github.com/repos/reactphp/http-client/zipball/a0f6814c385523a34773a6f1b2f620d390e579d5",
+                "reference": "a0f6814c385523a34773a6f1b2f620d390e579d5",
                 "shasum": ""
             },
             "require": {
@@ -580,11 +580,11 @@
                 "php": ">=5.4.0",
                 "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3",
                 "react/promise": "~2.2",
-                "react/socket": "^1.0 || ^0.8.2",
-                "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.2"
+                "react/socket": "^1.0 || ^0.8.4",
+                "react/stream": "^1.0 || ^0.7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.0 || ^4.8.10"
+                "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
             },
             "type": "library",
             "autoload": {
@@ -600,7 +600,7 @@
             "keywords": [
                 "http"
             ],
-            "time": "2017-08-25T12:20:26+00:00"
+            "time": "2018-02-08T11:18:52+00:00"
         },
         {
             "name": "react/promise",
