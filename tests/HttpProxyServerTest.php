@@ -1,12 +1,12 @@
 <?php
 
-use LeProxy\LeProxy\HttpProxyServer;
-use React\Http\ServerRequest;
-use React\Http\HttpBodyStream;
-use React\Stream\ThroughStream;
-use React\Promise\Promise;
 use LeProxy\LeProxy\ConnectorFactory;
+use LeProxy\LeProxy\HttpProxyServer;
+use React\Http\Io\HttpBodyStream;
+use React\Http\Io\ServerRequest;
+use React\Promise\Promise;
 use React\Promise\Timer\TimeoutException;
+use React\Stream\ThroughStream;
 
 class HttpProxyServerTest extends PHPUnit_Framework_TestCase
 {

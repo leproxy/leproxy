@@ -30,6 +30,9 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 --location ht
 out=$(curl -v --head --silent --fail --proxy socks5://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks4a://127.0.0.1:8180 --location http://github.com  2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
+# ensure we can receive multiple "Set-Cookie" headers
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 "http://httpbin.org/cookies/set?k2=v2&k1=v1" 2>&1) && (echo "$out" | grep -q "Set-Cookie: k2=v2;" && echo OK) || (echo "FAIL: $out" && exit 1) || exit 1
+
 # unneeded authentication should work
 out=$(curl -v --head --silent --fail --proxy http://user:pass@127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks5://user:pass@127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
