@@ -17,10 +17,9 @@
         "clue/connection-manager-extra": "^1.1",
         "clue/http-proxy-react": "^1.2",
         "clue/socks-react": "^0.8.5",
-        "react/dns": "^0.4.11",
         "react/http": "^0.7.2",
         "react/http-client": "^0.5.4",
-        "react/socket": "^0.8.2"
+        "react/socket": "^0.8.10"
     },
     "require-dev": {
         "clue/block-react": "^1.1",
