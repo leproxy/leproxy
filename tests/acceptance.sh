@@ -46,17 +46,20 @@ sleep 2
 
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://www.youtube.com 2>&1) && echo "FAIL: $out" && exit 1 || (echo "$out" | grep -q "504 Gateway Time-out" && echo OK) || (echo "FAIL: $out" && exit 1) || exit 1
 
-# restart LeProxy on IPv6 address
+# restart LeProxy on IPv6 address unless we're on Travis (does not support IPv6)
+if [ -z "$TRAVIS" ]
+then
 killall php 2>&- 1>&- || true
 php $bin [::]:8180 --no-log &
 sleep 2
 
 out=$(curl -v --head --silent --fail --proxy http://[::1]:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-[ -n "$TRAVIS" ] || out=$(curl -v --head --silent --fail --proxy http://[::1]:8180 http://[::1]:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy http://[::1]:8180 http://[::1]:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks://[::1]:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy socks://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
-[ -n "$TRAVIS" ] || out=$(curl -v --head --silent --fail --proxy socks5://[::1]:8180 http://[::1]:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+out=$(curl -v --head --silent --fail --proxy socks5://[::1]:8180 http://[::1]:8180/pac 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+fi
 
 # restart LeProxy with hosts and plain HTTP port blocked
 killall php 2>&- 1>&- || true
