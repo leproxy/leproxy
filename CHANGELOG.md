@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.2.1 (2018-03-09)
+
+*   Feature: Update Socket and DNS dependency to support loading system default
+    DNS config on all supported platforms.
+    (`/etc/resolv.conf` on Unix/Linux/Mac/Docker/WSL and WMIC on Windows)
+    (#45 by @clue)
+
+    This means that connecting to hosts that are managed by a local DNS server,
+    such as a corporate DNS server or when using Docker containers, will now
+    work as expected across all platforms with no changes required.
+
+*   Fix: Update HTTP and HttpClient dependencies to include a number of
+    improvements for HTTP handling (support multiple response cookies, larger
+    request headers and ignore corrupt response Transfer-Encoding).
+    (#46 by @clue)
+
+*   Reduce package size by updating HttpClient dependency and removing unneeded deps.
+    (#47 by @clue)
+
+*   Improve test suite by adding forward compatibility with updated
+    react/promise-stream and fix Travis builds by skipping all IPv6 tests.
+    (#42 by @WyriHaximus and #44 by @clue)
+
 ## 0.2.0 (2017-09-01)
 
 *   Feature: Add `--block=<target>` argument to blacklist destination addresses and
@@ -17,7 +40,7 @@
 *   Feature: Validate all arguments through commander instead of throwing exception
     (#37 by @clue)
 
-*   Feature: update Socket dependency to support hosts file on all platforms and
+*   Feature: Update Socket dependency to support hosts file on all platforms and
     update DNS dependency to fix Windows DNS timeout issues
     (#38 and #39 by @clue)
 

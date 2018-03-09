@@ -22,7 +22,7 @@ accepting both common HTTP and SOCKS proxy protocols on a single listening port.
 * [Development](#development)
 * [License](#license)
 
-> Note that this is a early beta version and that
+> Note that this is an early beta version and that
   LeProxy is under active development.
   Many new features are going to be added in the future!
 
@@ -40,7 +40,12 @@ $ sudo apt-get install php7.0-cli
 You can simply download the latest `leproxy-{version}.php` file from our
 [releases page](https://github.com/leproxy/leproxy/releases):
 
-[Latest release](https://github.com/leproxy/leproxy/releases/latest)
+The [latest release](https://github.com/leproxy/leproxy/releases/latest) can
+always simply be downloaded like this:
+
+```bash
+$ wget https://leproxy.org/leproxy-latest.php
+```
 
 Downloaded the `leproxy-{version}.php` file?
 You did it!! Really simple, huh?
