@@ -5,6 +5,7 @@ namespace LeProxy\LeProxy;
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\LoopInterface;
 use React\Http\Response;
+use React\Http\StreamingServer as HttpServer;
 use React\HttpClient\Client as HttpClient;
 use React\HttpClient\Response as ClientResponse;
 use React\Promise\Deferred;
@@ -48,7 +49,7 @@ class HttpProxyServer
         $this->client = $client;
 
         $that = $this;
-        $server = new \React\Http\Server(array($this, 'handleRequest'));
+        $server = new HttpServer(array($this, 'handleRequest'));
         $server->listen($socket);
     }
 
