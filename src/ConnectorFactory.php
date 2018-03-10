@@ -26,6 +26,30 @@ class ConnectorFactory
         if ($uri === '') {
             throw new \InvalidArgumentException('Upstream proxy URI must not be empty');
         }
+
+        // match Unix domain sockets (UDS) paths like "[user:pass@]/path" or
+        // "http+unix://[user:pass@]/path" or "socks[5|4|4a]+unix://[user:pass@]/path"
+        if (preg_match('/^(?:(?<scheme>socks(?:5|4|4a)?|http)\+unix:\/\/)?(?<auth>[^@]*@)?(?<path>.?.?\/.*)$/', $uri, $match)) {
+            // apply default scheme http+unix://
+            if ($match['scheme'] === '') {
+                $match['scheme'] = 'http';
+            }
+
+            if ($match['auth'] !== '') {
+                // explicitly replace socks:// with socks5://
+                if ($match['scheme'] === 'socks') {
+                    $match['scheme'] = 'socks5';
+                }
+
+                // only http:// and socks5:// support authentication
+                if ($match['scheme'] !== 'http' && $match['scheme'] !== 'socks5') {
+                    throw new \InvalidArgumentException('Upstream proxy scheme "' . $match['scheme'] . '+unix://" does not support username/password authentication');
+                }
+            }
+
+            return $match['scheme'] . '+unix://' . (isset($match['auth']) ? $match['auth'] : '') . $match['path'];
+        }
+
         if (strpos($uri, '://') === false) {
             $uri = 'http://' . $uri;
         }
@@ -126,7 +150,7 @@ class ConnectorFactory
      * Creates a new connector for the given proxy chain (list of proxy servers)
      *
      * The proxy chain may contain any number of proxy server URIs.
-     * Each proxy server URI may use `http://` or `socks[5|4a|4]://` URI scheme,
+     * Each proxy server URI may use `http[+unix]://` or `socks[5|4a|4][+unix]://` URI scheme,
      * with `http://` being the default if none is given.
      *
      * The proxy chain may be empty, in which case the connection will be direct.
@@ -144,7 +168,7 @@ class ConnectorFactory
         ));
 
         foreach ($path as $proxy) {
-            if (strpos($proxy, '://') === false || strpos($proxy, 'http://') === 0) {
+            if (strpos($proxy, '://') === false || strpos($proxy, 'http://') === 0 || strpos($proxy, 'http+unix://') === 0) {
                 $connector = new HttpClient($proxy, $connector);
             } else {
                 $connector = new SocksClient($proxy, $connector);

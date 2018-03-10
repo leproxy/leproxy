@@ -94,8 +94,8 @@ Arguments:
         forwarded to (proxy chaining).
         Any number of upstream proxies can be given.
         Each address consists of full URI which may contain a scheme, username
-        and password, host and port. Default scheme is `http://`, default port
-        is `8080` for all schemes.
+        and password, host and port (or Unix domain socket path). Default scheme
+        is `http://`, default port is `8080` for all schemes.
 
     --no-log
         By default, LeProxy logs all connection attempts to STDOUT for

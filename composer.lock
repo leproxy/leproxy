@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "25db1089664e456dcbe456bdc1749db4",
+    "content-hash": "a149a1c8ebe60763b53540b8d42f6418",
     "packages": [
         {
             "name": "clue/commander",
@@ -117,22 +117,22 @@
         },
         {
             "name": "clue/http-proxy-react",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-http-proxy-react.git",
-                "reference": "06bc84cda43c724edc5b5a19f61452e8094ba99d"
+                "reference": "eeff725640ed53386a6adb05ffdbfc2837404fdf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-http-proxy-react/zipball/06bc84cda43c724edc5b5a19f61452e8094ba99d",
-                "reference": "06bc84cda43c724edc5b5a19f61452e8094ba99d",
+                "url": "https://api.github.com/repos/clue/php-http-proxy-react/zipball/eeff725640ed53386a6adb05ffdbfc2837404fdf",
+                "reference": "eeff725640ed53386a6adb05ffdbfc2837404fdf",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3",
                 "react/promise": " ^2.1 || ^1.2.1",
-                "react/socket": "^1.0 || ^0.8 || ^0.7.1",
+                "react/socket": "^1.0 || ^0.8.4",
                 "ringcentral/psr7": "^1.2"
             },
             "require-dev": {
@@ -156,7 +156,7 @@
                     "email": "christian@lueck.tv"
                 }
             ],
-            "description": "Async HTTP CONNECT proxy connector, use any TCP/IP protocol through an HTTP proxy server, built on top of ReactPHP",
+            "description": "Async HTTP proxy connector, use any TCP/IP-based protocol through an HTTP CONNECT proxy server, built on top of ReactPHP",
             "homepage": "https://github.com/clue/php-http-proxy-react",
             "keywords": [
                 "async",
@@ -165,32 +165,32 @@
                 "proxy",
                 "reactphp"
             ],
-            "time": "2017-08-30T06:47:01+00:00"
+            "time": "2018-02-13T16:31:32+00:00"
         },
         {
             "name": "clue/socks-react",
-            "version": "v0.8.5",
+            "version": "v0.8.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/php-socks-react.git",
-                "reference": "00f7f16c2aceedd144b08a19a1414564c8e99d2d"
+                "reference": "0fcd6f2f506918ff003f1b995c6e78443f26e8ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/00f7f16c2aceedd144b08a19a1414564c8e99d2d",
-                "reference": "00f7f16c2aceedd144b08a19a1414564c8e99d2d",
+                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/0fcd6f2f506918ff003f1b995c6e78443f26e8ea",
+                "reference": "0fcd6f2f506918ff003f1b995c6e78443f26e8ea",
                 "shasum": ""
             },
             "require": {
-                "evenement/evenement": "~1.0|~2.0",
+                "evenement/evenement": "~3.0|~1.0|~2.0",
                 "php": ">=5.3",
                 "react/promise": "^2.1 || ^1.2",
-                "react/socket": "^1.0 || ^0.8 || ^0.7"
+                "react/socket": "^1.0 || ^0.8.6"
             },
             "require-dev": {
                 "clue/block-react": "^1.1",
                 "clue/connection-manager-extra": "^1.0 || ^0.7",
-                "phpunit/phpunit": "^5.0 || ^4.8",
+                "phpunit/phpunit": "^6.0 || ^5.7 || ^4.8.35",
                 "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3"
             },
             "type": "library",
@@ -220,7 +220,7 @@
                 "socks server",
                 "tcp tunnel"
             ],
-            "time": "2017-09-01T10:37:29+00:00"
+            "time": "2017-12-17T14:47:58+00:00"
         },
         {
             "name": "evenement/evenement",
