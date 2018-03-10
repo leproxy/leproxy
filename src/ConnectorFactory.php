@@ -72,6 +72,11 @@ class ConnectorFactory
      */
     public static function coerceListenUri($uri)
     {
+        // match Unix domain sockets (UDS) paths like "[user:pass@]/path"
+        if (preg_match('/^(?:[^@]*@)?.?.?\/.*$/', $uri)) {
+            return $uri;
+        }
+
         // apply default host if omitted for `:port` or `user@:port`
         $original = $uri;
         $uri = preg_replace('/(^|@)(:\d+)?$/', '${1}0.0.0.0${2}', $uri);

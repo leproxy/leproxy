@@ -148,6 +148,34 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
     }
 
+    public function testPlainGetOverUnixDomainSocketProxy()
+    {
+        // close TCP/IP socket and restart random Unix domain socket (UDS) path
+        $this->socketProxy->close();
+        $proxy = new LeProxyServer($this->loop);
+        $path = tempnam(sys_get_temp_dir(), 'test');
+        unlink($path);
+        $this->socketProxy = $proxy->listen($path, false);
+        $this->proxy = $this->socketProxy->getAddress();
+
+        // connect to proxy and send absolute target URI
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) use ($path) {
+            unlink($path);
+
+            $conn->write("GET http://127.0.0.1:8082/ HTTP/1.1\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
+        $this->assertNotContains("Server:", $response);
+        $this->assertNotContains("Date:", $response);
+        $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
+    }
+
     public function testPlainOptions()
     {
         // connect to proxy and send absolute target URI

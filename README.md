@@ -78,7 +78,8 @@ $ php leproxy.php 127.0.0.1:8080
 ```
 
 > The listening address MUST be in the form `ip:port` or just `ip` or `:port`,
-  with the above defaults being applied.
+  with the above defaults being applied (or you can use a Unix domain socket
+  path).
 
 Note that LeProxy runs in protected mode by default, so that it only forwards
 requests from the local host and can not be abused as an open proxy.

@@ -61,7 +61,7 @@ Arguments:
     <listenAddress>
         The socket address to listen on.
         The address consists of a full URI which may contain a username and
-        password, host and port.
+        password, host and port (or Unix domain socket path).
         By default, LeProxy will listen on the public address 0.0.0.0:8080.
         LeProxy will report an error if it fails to listen on the given address,
         you may try another address or use port `0` to pick a random free port.
@@ -190,7 +190,7 @@ try {
     exit(71);
 }
 
-$addr = str_replace('tcp://', 'http://', $socket->getAddress());
+$addr = str_replace(array('tcp://', 'unix://'), array('http://', 'http+unix://'), $socket->getAddress());
 echo 'LeProxy HTTP/SOCKS proxy now listening on ' . $addr . ' (';
 if (strpos($args['listen'], '@') !== false) {
     echo 'authentication required';
