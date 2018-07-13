@@ -426,4 +426,53 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
         //$this->assertContains("Server: LeProxy\r\n", $response);
         //$this->assertNotContains('X-Powered-By', $response);
     }
+
+    public function testPlainPostWithChunkedTransferEncodingReturns411LengthRequired()
+    {
+        // connect to proxy and send request with (rare but valid) "Transfer-Encoding: chunked"
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("POST http://127.0.0.1:8082/ HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 411 Length Required\r\n", $response);
+        $this->assertContains("Server: LeProxy", $response);
+        $this->assertContains("\r\n\r\nLeProxy HTTP/SOCKS proxy does not allow buffering chunked requests", $response);
+    }
+
+    public function testPlainPostWithUnknownTransferEncodingReturns501NotImplemented()
+    {
+        // connect to proxy and send request with unknown "Transfer-Encoding: foo"
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("POST http://127.0.0.1:8082/ HTTP/1.1\r\nTransfer-Encoding: foo\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 501 Not Implemented\r\n", $response);
+        $this->assertNotContains("Server: LeProxy", $response);
+    }
+
+    public function testPlainPostWithChunkedTransferEncodingAndContentLengthReturns400BadRequest()
+    {
+        // connect to proxy and send invalid request with both "Transfer-Encoding: chunked" and "Content-Length"
+        $connector = new Connector($this->loop);
+        $promise = $connector->connect($this->proxy)->then(function (ConnectionInterface $conn) {
+            $conn->write("POST http://127.0.0.1:8082/ HTTP/1.1\r\nTransfer-Encoding: chunked\r\nContent-Length: 0\r\n\r\n");
+
+            return Stream\buffer($conn);
+        });
+
+        $response = Block\await($promise, $this->loop, 0.1);
+
+        $this->assertStringStartsWith("HTTP/1.1 400 Bad Request\r\n", $response);
+        $this->assertNotContains("Server: LeProxy", $response);
+    }
 }

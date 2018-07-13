@@ -67,6 +67,17 @@ class HttpProxyServer
             $request = $request->withAttribute('source', 'http://' . $params['REMOTE_ADDR'] . ':' . $params['REMOTE_PORT']);
         }
 
+        // reject incoming request with "Transfer-Encoding: chunked"
+        if ($request->hasHeader('Transfer-Encoding')) {
+            return new Response(
+                411,
+                array(
+                    'Content-Type' => 'text/plain',
+                ) + $this->headers,
+                'LeProxy HTTP/SOCKS proxy does not allow buffering chunked requests'
+            );
+        }
+
         // direct (origin / non-proxy) requests start with a slash
         $direct = substr($request->getRequestTarget(), 0, 1) === '/';
 
