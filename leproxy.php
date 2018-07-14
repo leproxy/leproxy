@@ -20,8 +20,8 @@ use Clue\Commander\Tokens\Tokenizer;
 use React\EventLoop\Factory;
 use React\Dns\Config\HostsFile;
 
-if (PHP_VERSION_ID < 50400 || PHP_SAPI !== 'cli') {
-    echo 'LeProxy HTTP/SOCKS proxy requires running ' . (PHP_SAPI !== 'cli' ? ('via command line (not ' . PHP_SAPI . ')') : ('on PHP 5.4+ (is ' . PHP_VERSION . ')')) . PHP_EOL;
+if (PHP_VERSION_ID < 50308 || PHP_SAPI !== 'cli') {
+    echo 'LeProxy HTTP/SOCKS proxy requires running ' . (PHP_SAPI !== 'cli' ? ('via command line (not ' . PHP_SAPI . ')') : ('on PHP 5.3.8+ (is ' . PHP_VERSION . ')')) . PHP_EOL;
     exit(1);
 }
 

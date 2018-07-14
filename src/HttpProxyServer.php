@@ -49,7 +49,9 @@ class HttpProxyServer
         $this->client = $client;
 
         $that = $this;
-        $server = new HttpServer(array($this, 'handleRequest'));
+        $server = new HttpServer(function (ServerRequestInterface $request) use ($that) {
+            return $that->handleRequest($request);
+        });
         $server->listen($socket);
     }
 
@@ -151,22 +153,24 @@ class HttpProxyServer
         }
 
         // try to connect to given target host
+        $headers = $this->headers;
+        $that = $this;
         return $this->connector->connect($uri)->then(
-            function (ConnectionInterface $remote) {
+            function (ConnectionInterface $remote) use ($headers) {
                 // connection established => forward data
                 return new Response(
                     200,
-                    $this->headers,
+                    $headers,
                     $remote
                 );
             },
-            function (\Exception $e) {
+            function (\Exception $e) use ($headers, $that) {
                 return new Response(
-                    $this->getCode($e),
+                    $that->getCode($e),
                     array(
                         'Content-Type' => 'text/plain'
-                    ) + $this->headers,
-                    'Unable to connect: ' . $this->getMessage($e)
+                    ) + $headers,
+                    'Unable to connect: ' . $that->getMessage($e)
                 );
             }
         );
@@ -231,13 +235,15 @@ class HttpProxyServer
             $deferred->resolve($response);
         });
 
-        $outgoing->on('error', function (Exception $e) use ($deferred) {
+        $headers = $this->headers;
+        $that = $this;
+        $outgoing->on('error', function (Exception $e) use ($deferred, $headers, $that) {
             $deferred->resolve(new Response(
-                $this->getCode($e),
+                $that->getCode($e),
                 array(
                     'Content-Type' => 'text/plain'
-                ) + $this->headers,
-                'Unable to request: ' . $this->getMessage($e)
+                ) + $headers,
+                'Unable to request: ' . $that->getMessage($e)
             ));
         });
 
@@ -292,12 +298,13 @@ EOF
     }
 
     /**
-     * Returns an appropriate HTTP status code for the given Exception
+     * [Internal] Returns an appropriate HTTP status code for the given Exception
      *
      * @param \Exception $e
      * @return int
+     * @internal
      */
-    private function getCode(\Exception $e)
+    public function getCode(\Exception $e)
     {
         if ($e->getCode() === ConnectorFactory::CODE_BLOCKED) {
             // Only map our block list to 403 (Forbidden)
@@ -315,12 +322,13 @@ EOF
     }
 
     /**
-     * Returns the exception message and all its previous exceptions concatenated
+     * [Internal] Returns the exception message and all its previous exceptions concatenated
      *
      * @param Exception $e
      * @return string
+     * @internal
      */
-    private function getMessage(Exception $e)
+    public function getMessage(Exception $e)
     {
         $message = '';
         while ($e !== null) {

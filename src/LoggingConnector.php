@@ -32,14 +32,15 @@ class LoggingConnector implements ConnectorInterface
         }
         $source = isset($args['source']) ? $args['source'] : null;
 
+        $logger = $this->logger;
         return $this->connector->connect($uri)->then(
-            function (ConnectionInterface $connection) use ($source, $uri) {
-                $this->logger->logConnection($source, $uri, $connection->getRemoteAddress());
+            function (ConnectionInterface $connection) use ($source, $uri, $logger) {
+                $logger->logConnection($source, $uri, $connection->getRemoteAddress());
 
                 return $connection;
             },
-            function (\Exception $e) use ($source, $uri) {
-                $this->logger->logFailConnection($source, $uri, $e->getMessage());
+            function (\Exception $e) use ($source, $uri, $logger) {
+                $logger->logFailConnection($source, $uri, $e->getMessage());
 
                 throw $e;
             }

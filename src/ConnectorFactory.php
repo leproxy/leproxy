@@ -193,7 +193,7 @@ class ConnectorFactory
     public static function createBlockingConnector(array $block, ConnectorInterface $base)
     {
         $reject = new ConnectionManagerReject(function () {
-            throw new \RuntimeException('Connection blocked', self::CODE_BLOCKED);
+            throw new \RuntimeException('Connection blocked', ConnectorFactory::CODE_BLOCKED);
         });
 
         // reject all hosts given in the block list

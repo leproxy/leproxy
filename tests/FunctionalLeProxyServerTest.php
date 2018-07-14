@@ -28,10 +28,11 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 
         $this->socketOrigin = new Socket(8082, $this->loop);
 
-        $origin = new Server(function (ServerRequestInterface $request) {
+        $headers =& $this->headers;
+        $origin = new Server(function (ServerRequestInterface $request) use (&$headers) {
             return new Response(
                 200,
-                $this->headers + array(
+                $headers + array(
                     'X-Powered-By' => '',
                     'Date' => '',
                 ),

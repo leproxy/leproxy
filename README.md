@@ -29,7 +29,7 @@ accepting both common HTTP and SOCKS proxy protocols on a single listening port.
 ## Install
 
 LeProxy requires only PHP.
-*PHP 7+ is highly recommended*, but it runs on any system that uses PHP 5.4+ or
+*PHP 7+ is highly recommended*, but it runs on any system that uses PHP 5.3+ or
 HHVM.
 If you have not installed PHP already, on a recent Ubuntu/Debian system, simply run:
 
