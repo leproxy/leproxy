@@ -13,6 +13,17 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
             'socks://user:pass@host' => 'socks5://user:pass@host:8080',
             'user@host' => 'http://user:@host:8080',
             'socks4a://10.20.30.40:5060' => 'socks4a://10.20.30.40:5060',
+
+            './proxy.sock' => 'http+unix://./proxy.sock',
+            '/tmp/proxy.sock' => 'http+unix:///tmp/proxy.sock',
+            'user:pass@./proxy.sock' => 'http+unix://user:pass@./proxy.sock',
+            'http+unix://./proxy.sock' => 'http+unix://./proxy.sock',
+            'http+unix:///tmp/proxy.sock' => 'http+unix:///tmp/proxy.sock',
+            'http+unix://user:pass@./proxy.sock' => 'http+unix://user:pass@./proxy.sock',
+            'http+unix://user@./proxy.sock' => 'http+unix://user@./proxy.sock',
+            'socks+unix://./proxy.sock' => 'socks+unix://./proxy.sock',
+            'socks+unix://user:pass@./proxy.sock' => 'socks5+unix://user:pass@./proxy.sock',
+            'socks5+unix://user:pass@./proxy.sock' => 'socks5+unix://user:pass@./proxy.sock',
         );
 
         foreach ($uris as $in => $out) {
@@ -30,12 +41,15 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
             'excessive path' => 'host/root',
             'excessive query' => 'host?query',
             'excessive fragment' => 'host#fragment',
+
+            'excessive dots' => '.../server.sock',
+            'auth for invalid socks4+unix' => 'socks4+unix://user:pass@./proxy.sock'
         );
 
         foreach ($uris as $uri) {
             try {
                 ConnectorFactory::coerceProxyUri($uri);
-                $this->fail();
+                $this->fail($uri);
             } catch (InvalidArgumentException $e) {
                 $this->assertTrue(true);
             }
@@ -57,7 +71,13 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
             '12:34@:45' => '12:34@0.0.0.0:45',
             'user:pass@' => 'user:pass@0.0.0.0:8080',
             '[::1]' => '[::1]:8080',
-            'user:pass@[::1]' => 'user:pass@[::1]:8080'
+            'user:pass@[::1]' => 'user:pass@[::1]:8080',
+
+            './proxy.sock' => './proxy.sock',
+            '../proxy.sock' => '../proxy.sock',
+            '/tmp/proxy.sock' => '/tmp/proxy.sock',
+            'user:pass@./proxy.sock' => 'user:pass@./proxy.sock',
+            'user:pass@/tmp/proxy.sock' => 'user:pass@/tmp/proxy.sock',
         );
 
         foreach ($uris as $in => $out) {
@@ -75,6 +95,9 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
             'excessive path' => '127.0.0.1:8080/root',
             'excessive query' => '127.0.0.1:8080?query',
             'excessive fragment' => '127.0.0.1:8080#fragment',
+
+            'excessive dots' => '.../proxy.sock',
+            'path looks like hostname' => 'proxy.sock',
         );
 
         foreach ($uris as $uri) {

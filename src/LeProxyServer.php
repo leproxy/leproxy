@@ -36,22 +36,31 @@ class LeProxyServer
      */
     public function listen($listen, $allowUnprotected)
     {
-        $nullport = false;
-        if (substr($listen, -2) === ':0') {
-            $nullport = true;
-            $listen = substr($listen, 0, -2) . ':10000';
-        }
+        if (preg_match('/^(([^:]*):([^@]*)@)?(.?.?\/.*)$/', $listen, $parts)) {
+            // match Unix domain sockets (UDS) paths like "[user:pass@]/path"
+            $socket = new Socket('unix://' . $parts[4], $this->loop);
+            $parts = isset($parts[1]) && $parts[1] !== '' ? array('user' => $parts[2], 'pass' => $parts[3]) : array();
+        } else {
+            // parse "[user:pass@]host[:port]" with optional auth and port
 
-        $parts = parse_url('http://' . $listen);
-        if (!$parts || !isset($parts['scheme'], $parts['host'], $parts['port'])) {
-            throw new InvalidArgumentException('Invalid URI for listening address');
-        }
+            // null port means random port assignment and needs to be parsed separately
+            $nullport = false;
+            if (substr($listen, -2) === ':0') {
+                $nullport = true;
+                $listen = substr($listen, 0, -2) . ':10000';
+            }
 
-        if ($nullport) {
-            $parts['port'] = 0;
-        }
+            $parts = parse_url('http://' . $listen);
+            if (!$parts || !isset($parts['scheme'], $parts['host'], $parts['port'])) {
+                throw new InvalidArgumentException('Invalid URI for listening address');
+            }
 
-        $socket = new Socket($parts['host'] . ':' . $parts['port'], $this->loop);
+            if ($nullport) {
+                $parts['port'] = 0;
+            }
+
+            $socket = new Socket($parts['host'] . ':' . $parts['port'], $this->loop);
+        }
 
         // start new proxy server which uses the given connector for forwarding/chaining
         $unification = new ProtocolDetector($socket);

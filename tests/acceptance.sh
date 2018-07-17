@@ -92,6 +92,16 @@ out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://googl
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://maps.google.com 2>&1) && echo "FAIL: $out" && exit 1 || (echo "$out" | grep -q "403 Forbidden" && echo OK) || (echo "FAIL: $out" && exit 1) || exit 1
 out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 https://google.de 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
 
+# restart LeProxy on Unix domain socket path and another LeProxy instance for chaining
+killall php 2>&- 1>&- || true
+php $bin ./leproxy.tmp.socket --no-log &
+pid=$!
+php $bin :8180 --proxy ./leproxy.tmp.socket --no-log &
+sleep 2
+
+out=$(curl -v --head --silent --fail --proxy http://127.0.0.1:8180 http://reactphp.org 2>&1) && echo OK || (echo "FAIL: $out" && exit 1) || exit 1
+kill $pid && rm leproxy.tmp.socket && echo . || (echo "FAIL" && exit 1) || exit 1
+
 # restart LeProxy with authentication required
 killall php 2>&- 1>&- || true
 php $bin user:pass@127.0.0.1:8180 --no-log &
