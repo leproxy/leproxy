@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.2 (2018-07-17)
+
+*   Feature: Support listening on Unix domain socket (UDS) paths and
+    support proxy forwarding/chaining via Unix domain socket (UDS) paths.
+    (#51 by @clue)
+
+    LeProxy now supports listening on Unix domain socket (UDS) paths and
+    proxy forwarding/chaining via Unix domain socket (UDS) paths,
+    both of which are considered advanced usage:
+
+    ```bash
+    $ php leproxy.php ./proxy.socket
+
+    $ php.leproxy.php :8080 --proxy http+unix://./proxy.socket
+    ```
+
+*   Feature: Update HTTP dependencies and reject chunked requests and
+    update ReactPHP to stable LTS releases.
+    (#49 and #50 by @clue)
+
 ## 0.2.1 (2018-03-09)
 
 *   Feature: Update Socket and DNS dependency to support loading system default

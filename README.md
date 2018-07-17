@@ -38,19 +38,18 @@ $ sudo apt-get install php7.0-cli
 ```
 
 You can simply download the latest `leproxy-{version}.php` file from our
-[releases page](https://github.com/leproxy/leproxy/releases):
-
+[releases page](https://github.com/leproxy/leproxy/releases).
 The [latest release](https://github.com/leproxy/leproxy/releases/latest) can
-always simply be downloaded like this:
+always be downloaded like this:
 
 ```bash
-$ wget https://leproxy.org/leproxy-latest.php
+$ curl -OL https://leproxy.org/leproxy-latest.php
 ```
 
 Downloaded the `leproxy-{version}.php` file?
 You did it!! Really simple, huh?
 
-> LeProxy is distributed as a PHP single file that contains everything you need
+> LeProxy is distributed as a single PHP file that contains everything you need
   to run LeProxy.
   The below examples assume you have saved this file as `leproxy.php` locally,
   but you can use any name you want.
