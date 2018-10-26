@@ -39,16 +39,11 @@ class HttpProxyServer
      */
     public $allowUnprotected = true;
 
-    public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
+    public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector)
     {
-        if ($client === null) {
-            $client = new HttpClient($loop, $connector);
-        }
-
         $this->connector = $connector;
-        $this->client = $client;
+        $this->client = new HttpClient($loop, $connector);
 
-        $that = $this;
         $server = new HttpServer(array($this, 'handleRequest'));
         $server->listen($socket);
     }

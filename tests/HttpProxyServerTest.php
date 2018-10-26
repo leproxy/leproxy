@@ -221,7 +221,11 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
             ->with('GET', 'http://example.com/', array('Cookie' => array('name=value'), 'USER-AGENT' => array('TEST')))
             ->willReturn($outgoing);
 
-        $server = new HttpProxyServer($loop, $socket, $connector, $client);
+        $server = new HttpProxyServer($loop, $socket, $connector);
+
+        $ref = new ReflectionProperty($server, 'client');
+        $ref->setAccessible(true);
+        $ref->setValue($server, $client);
 
         $request = new ServerRequest('GET', 'http://example.com/', array('Cookie' => 'name=value', 'USER-AGENT' => 'TEST'));
         $request = $request->withRequestTarget((string)$request->getUri());
@@ -246,8 +250,12 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
                ->with('GET', 'http://example.com/', array('Cookie' => array('name=value'), 'User-Agent' => array()))
                ->willReturn($outgoing);
 
-        $server = new HttpProxyServer($loop, $socket, $connector, $client);
+        $server = new HttpProxyServer($loop, $socket, $connector);
         $server->setAuthArray(array('user' => 'pass'));
+
+        $ref = new ReflectionProperty($server, 'client');
+        $ref->setAccessible(true);
+        $ref->setValue($server, $client);
 
         $request = new ServerRequest('GET', 'http://example.com/', array('Proxy-Authorization' => 'Basic dXNlcjpwYXNz', 'Cookie' => 'name=value'));
         $request = $request->withRequestTarget((string)$request->getUri());
