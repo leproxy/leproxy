@@ -48,6 +48,20 @@ class LoggingConnectorTest extends PHPUnit_Framework_TestCase
         $connector->connect('example.com:80?source=' . rawurlencode('http://user:pass@host:8080'));
     }
 
+    public function testConnectErrorWithoutSourcePrintsErrorMessageWithoutConnectionTargetRepeated()
+    {
+        $promise = Promise\reject(new RuntimeException('Connection to X failed: reasons'));
+
+        $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+        $connector->expects($this->once())->method('connect')->with('example.com:80')->willReturn($promise);
+
+        $logger = $this->getMockBuilder('LeProxy\LeProxy\Logger')->getMock();
+        $logger->expects($this->once())->method('logFailConnection')->with(null, 'example.com:80', 'failed: reasons');
+        $connector = new LoggingConnector($connector, $logger);
+
+        $connector->connect('example.com:80');
+    }
+
     public function testConnectSuccessWithoutSourcePrintsSuccessWithoutSource()
     {
         $connection = $this->getMockBuilder('React\Socket\ConnectionInterface')->getMock();
