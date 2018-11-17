@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eb34b950c92e712e28708096c3db26f3",
+    "content-hash": "40d6f3f2ba0850279ad6115d2b5d2b31",
     "packages": [
         {
             "name": "clue/commander",
@@ -169,23 +169,22 @@
         },
         {
             "name": "clue/socks-react",
-            "version": "v0.8.7",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/clue/php-socks-react.git",
-                "reference": "0fcd6f2f506918ff003f1b995c6e78443f26e8ea"
+                "url": "https://github.com/clue/reactphp-socks.git",
+                "reference": "f60ae627807b4b04de0c5beca2344f6df666b802"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/0fcd6f2f506918ff003f1b995c6e78443f26e8ea",
-                "reference": "0fcd6f2f506918ff003f1b995c6e78443f26e8ea",
+                "url": "https://api.github.com/repos/clue/reactphp-socks/zipball/f60ae627807b4b04de0c5beca2344f6df666b802",
+                "reference": "f60ae627807b4b04de0c5beca2344f6df666b802",
                 "shasum": ""
             },
             "require": {
-                "evenement/evenement": "~3.0|~1.0|~2.0",
                 "php": ">=5.3",
                 "react/promise": "^2.1 || ^1.2",
-                "react/socket": "^1.0 || ^0.8.6"
+                "react/socket": "^1.1"
             },
             "require-dev": {
                 "clue/block-react": "^1.1",
@@ -209,18 +208,19 @@
                     "email": "christian@lueck.tv"
                 }
             ],
-            "description": "Async SOCKS4, SOCKS4a and SOCKS5 proxy client and server implementation, built on top of ReactPHP",
-            "homepage": "https://github.com/clue/php-socks-react",
+            "description": "Async SOCKS proxy connector client and server implementation, tunnel any TCP/IP-based protocol through a SOCKS5 or SOCKS4(a) proxy server, built on top of ReactPHP.",
+            "homepage": "https://github.com/clue/reactphp-socks",
             "keywords": [
                 "async",
-                "proxy",
+                "proxy server",
                 "reactphp",
                 "socks client",
-                "socks protocol",
                 "socks server",
+                "socks4a",
+                "socks5",
                 "tcp tunnel"
             ],
-            "time": "2017-12-17T14:47:58+00:00"
+            "time": "2018-11-20T11:16:19+00:00"
         },
         {
             "name": "evenement/evenement",

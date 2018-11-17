@@ -59,7 +59,12 @@ class ConnectorFactory
             throw new \InvalidArgumentException('Upstream proxy "' . $uri . '" can not be parsed as a valid URI');
         }
 
-        if (!in_array($parts['scheme'], array('http', 'socks', 'socks5', 'socks4', 'socks4a'))) {
+        // deprecated, for BC only: map explicit SOCKS4a to SOCKS4, should be removed in the future
+        if ($parts['scheme'] === 'socks4a') {
+            $parts['scheme'] = 'socks4';
+        }
+
+        if (!in_array($parts['scheme'], array('http', 'socks', 'socks5', 'socks4'))) {
             throw new \InvalidArgumentException('Upstream proxy scheme "' . $parts['scheme'] . '://" not supported');
         }
 
@@ -82,6 +87,9 @@ class ConnectorFactory
 
             $parts += array('user' => '', 'pass' => '');
             $parts['host'] = $parts['user'] . ':' . $parts['pass'] . '@' . $parts['host'];
+        } elseif ($parts['scheme'] === 'socks') {
+            // deprecated, for BC only: map unspecified SOCKS to SOCKS4(a), should be SOCKS5 in the future
+            $parts['scheme'] = 'socks4';
         }
 
         return $parts['scheme'] . '://' . $parts['host'] . ':' . $parts['port'];

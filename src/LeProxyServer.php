@@ -60,31 +60,36 @@ class LeProxyServer
             $socket = new Socket($parts['host'] . ':' . $parts['port'], $this->loop);
         }
 
-        // start new proxy server which uses the given connector for forwarding/chaining
-        $unification = new ProtocolDetector($socket);
-        $http = new HttpProxyServer($this->loop, $unification->http, $this->connector);
-        $socks = new SocksServer(
-            $this->loop,
-            $unification->socks,
-            new SocksErrorConnector(
-                $this->connector,
-                !isset($parts['user']) && !isset($parts['pass']) && !$allowUnprotected
-            )
-        );
-
         // require authentication if listening URI contains username/password
+        $auth = null;
         if (isset($parts['user']) || isset($parts['pass'])) {
             $auth = array(
                 rawurldecode($parts['user']) => isset($parts['pass']) ? rawurldecode($parts['pass']) : ''
             );
+        }
 
+        // start new proxy server which uses the given connector for forwarding/chaining
+        $unification = new ProtocolDetector($socket);
+
+        // HTTP server with authentication required or protected mode by default
+        $http = new HttpProxyServer($this->loop, $unification->http, $this->connector);
+        if ($auth !== null) {
             $http->setAuthArray($auth);
-            $socks->setAuthArray($auth);
         } elseif (!$allowUnprotected) {
             // no authentication required, so only allow local HTTP requests (protected mode)
-            // SOCKS works slightly differently and simply rejects every non-local connection attempt, see SocksErrorConnector
             $http->allowUnprotected = false;
         }
+
+        // SOCKS server works slightly differently and simply rejects every non-local connection attempt via SocksErrorConnector
+        $socks = new SocksServer(
+            $this->loop,
+            new SocksErrorConnector(
+                $this->connector,
+                !isset($parts['user']) && !isset($parts['pass']) && !$allowUnprotected
+            ),
+            $auth
+        );
+        $socks->listen($unification->socks);
 
         return $socket;
     }
