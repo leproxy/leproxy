@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a149a1c8ebe60763b53540b8d42f6418",
+    "content-hash": "40d6f3f2ba0850279ad6115d2b5d2b31",
     "packages": [
         {
             "name": "clue/commander",
@@ -117,22 +117,22 @@
         },
         {
             "name": "clue/http-proxy-react",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/clue/php-http-proxy-react.git",
-                "reference": "eeff725640ed53386a6adb05ffdbfc2837404fdf"
+                "url": "https://github.com/clue/reactphp-http-proxy.git",
+                "reference": "5a6790443366dada996993c0a458f13e616fe10e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-http-proxy-react/zipball/eeff725640ed53386a6adb05ffdbfc2837404fdf",
-                "reference": "eeff725640ed53386a6adb05ffdbfc2837404fdf",
+                "url": "https://api.github.com/repos/clue/reactphp-http-proxy/zipball/5a6790443366dada996993c0a458f13e616fe10e",
+                "reference": "5a6790443366dada996993c0a458f13e616fe10e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3",
                 "react/promise": " ^2.1 || ^1.2.1",
-                "react/socket": "^1.0 || ^0.8.4",
+                "react/socket": "^1.1",
                 "ringcentral/psr7": "^1.2"
             },
             "require-dev": {
@@ -157,7 +157,7 @@
                 }
             ],
             "description": "Async HTTP proxy connector, use any TCP/IP-based protocol through an HTTP CONNECT proxy server, built on top of ReactPHP",
-            "homepage": "https://github.com/clue/php-http-proxy-react",
+            "homepage": "https://github.com/clue/reactphp-http-proxy",
             "keywords": [
                 "async",
                 "connect",
@@ -165,27 +165,26 @@
                 "proxy",
                 "reactphp"
             ],
-            "time": "2018-02-13T16:31:32+00:00"
+            "time": "2018-10-30T14:41:14+00:00"
         },
         {
             "name": "clue/socks-react",
-            "version": "v0.8.7",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/clue/php-socks-react.git",
-                "reference": "0fcd6f2f506918ff003f1b995c6e78443f26e8ea"
+                "url": "https://github.com/clue/reactphp-socks.git",
+                "reference": "f60ae627807b4b04de0c5beca2344f6df666b802"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-socks-react/zipball/0fcd6f2f506918ff003f1b995c6e78443f26e8ea",
-                "reference": "0fcd6f2f506918ff003f1b995c6e78443f26e8ea",
+                "url": "https://api.github.com/repos/clue/reactphp-socks/zipball/f60ae627807b4b04de0c5beca2344f6df666b802",
+                "reference": "f60ae627807b4b04de0c5beca2344f6df666b802",
                 "shasum": ""
             },
             "require": {
-                "evenement/evenement": "~3.0|~1.0|~2.0",
                 "php": ">=5.3",
                 "react/promise": "^2.1 || ^1.2",
-                "react/socket": "^1.0 || ^0.8.6"
+                "react/socket": "^1.1"
             },
             "require-dev": {
                 "clue/block-react": "^1.1",
@@ -209,18 +208,19 @@
                     "email": "christian@lueck.tv"
                 }
             ],
-            "description": "Async SOCKS4, SOCKS4a and SOCKS5 proxy client and server implementation, built on top of ReactPHP",
-            "homepage": "https://github.com/clue/php-socks-react",
+            "description": "Async SOCKS proxy connector client and server implementation, tunnel any TCP/IP-based protocol through a SOCKS5 or SOCKS4(a) proxy server, built on top of ReactPHP.",
+            "homepage": "https://github.com/clue/reactphp-socks",
             "keywords": [
                 "async",
-                "proxy",
+                "proxy server",
                 "reactphp",
                 "socks client",
-                "socks protocol",
                 "socks server",
+                "socks4a",
+                "socks5",
                 "tcp tunnel"
             ],
-            "time": "2017-12-17T14:47:58+00:00"
+            "time": "2018-11-20T11:16:19+00:00"
         },
         {
             "name": "evenement/evenement",
@@ -695,16 +695,16 @@
         },
         {
             "name": "react/socket",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "476e2644a634c6301b8111e6d22a61679e6e6bd0"
+                "reference": "34381d9282d12670eb56b45981aad82e033ed58f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/476e2644a634c6301b8111e6d22a61679e6e6bd0",
-                "reference": "476e2644a634c6301b8111e6d22a61679e6e6bd0",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/34381d9282d12670eb56b45981aad82e033ed58f",
+                "reference": "34381d9282d12670eb56b45981aad82e033ed58f",
                 "shasum": ""
             },
             "require": {
@@ -738,7 +738,7 @@
                 "reactphp",
                 "stream"
             ],
-            "time": "2018-07-11T14:38:22+00:00"
+            "time": "2018-10-01T12:20:53+00:00"
         },
         {
             "name": "react/stream",
@@ -1004,16 +1004,16 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.7.6",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "33a7e3c4fda54e912ff6338c48823bd5c0f0b712"
+                "reference": "4ba436b55987b4bf311cb7c6ba82aa528aac0a06"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/33a7e3c4fda54e912ff6338c48823bd5c0f0b712",
-                "reference": "33a7e3c4fda54e912ff6338c48823bd5c0f0b712",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/4ba436b55987b4bf311cb7c6ba82aa528aac0a06",
+                "reference": "4ba436b55987b4bf311cb7c6ba82aa528aac0a06",
                 "shasum": ""
             },
             "require": {
@@ -1025,12 +1025,12 @@
             },
             "require-dev": {
                 "phpspec/phpspec": "^2.5|^3.2",
-                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5"
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5 || ^7.1"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.7.x-dev"
+                    "dev-master": "1.8.x-dev"
                 }
             },
             "autoload": {
@@ -1063,7 +1063,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2018-04-18T13:57:24+00:00"
+            "time": "2018-08-05T17:53:17+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1815,25 +1815,28 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.8.0",
+            "version": "v1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "7cc359f1b7b80fc25ed7796be7d96adc9b354bae"
+                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/7cc359f1b7b80fc25ed7796be7d96adc9b354bae",
-                "reference": "7cc359f1b7b80fc25ed7796be7d96adc9b354bae",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/e3d826245268269cd66f8326bd8bc066687b4a19",
+                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
+            "suggest": {
+                "ext-ctype": "For best performance"
+            },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.8-dev"
+                    "dev-master": "1.9-dev"
                 }
             },
             "autoload": {
@@ -1866,20 +1869,20 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2018-04-30T19:57:29+00:00"
+            "time": "2018-08-06T14:22:27+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.8.42",
+            "version": "v2.8.46",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "51356b7a2ff7c9fd06b2f1681cc463bb62b5c1ff"
+                "reference": "5baf0f821b14eee8ca415e6a0361a9fa140c002c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/51356b7a2ff7c9fd06b2f1681cc463bb62b5c1ff",
-                "reference": "51356b7a2ff7c9fd06b2f1681cc463bb62b5c1ff",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/5baf0f821b14eee8ca415e6a0361a9fa140c002c",
+                "reference": "5baf0f821b14eee8ca415e6a0361a9fa140c002c",
                 "shasum": ""
             },
             "require": {
@@ -1916,7 +1919,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-05-01T22:52:40+00:00"
+            "time": "2018-08-29T13:11:53+00:00"
         }
     ],
     "aliases": [],

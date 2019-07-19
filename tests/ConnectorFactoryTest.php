@@ -9,10 +9,10 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
         $uris = array(
             'host' => 'http://host:8080',
             'host:1234' => 'http://host:1234',
-            'socks://host' => 'socks://host:8080',
+            'socks://host' => 'socks4://host:8080',
             'socks://user:pass@host' => 'socks5://user:pass@host:8080',
             'user@host' => 'http://user:@host:8080',
-            'socks4a://10.20.30.40:5060' => 'socks4a://10.20.30.40:5060',
+            'socks4a://10.20.30.40:5060' => 'socks4://10.20.30.40:5060',
 
             './proxy.sock' => 'http+unix://./proxy.sock',
             '/tmp/proxy.sock' => 'http+unix:///tmp/proxy.sock',

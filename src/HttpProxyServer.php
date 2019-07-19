@@ -14,7 +14,6 @@ use React\Socket\ConnectorInterface;
 use React\Socket\ServerInterface;
 use Exception;
 use React\Stream\ReadableStreamInterface;
-use React\Promise\Timer\TimeoutException;
 
 class HttpProxyServer
 {
@@ -39,16 +38,11 @@ class HttpProxyServer
      */
     public $allowUnprotected = true;
 
-    public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector, HttpClient $client = null)
+    public function __construct(LoopInterface $loop, ServerInterface $socket, ConnectorInterface $connector)
     {
-        if ($client === null) {
-            $client = new HttpClient($loop, $connector);
-        }
-
         $this->connector = $connector;
-        $this->client = $client;
+        $this->client = new HttpClient($loop, $connector);
 
-        $that = $this;
         $server = new HttpServer(array($this, 'handleRequest'));
         $server->listen($socket);
     }
@@ -315,10 +309,9 @@ EOF
             // Upstream proxy servers may return EACCESS (permission denied), but this
             // is a server-side issue and not to be reported as an auth issue to the client
             return 403;
-        } elseif ($e instanceof TimeoutException) {
-            // Only map our own TimeoutEception to 504 (Gateway Timeout)
-            // Upstream proxy servers may return ETIMDOUT (timed out), but this
-            // is a server-side issue and not to be reported as a timeout issue to the client
+        } elseif ($e->getCode() === (\defined('SOCKET_ETIMEDOUT') ? \SOCKET_ETIMEDOUT : 110)) {
+            // map timeout exceptions to 504 (Gateway Timeout)
+            // A `TimeoutExecutor` or upstream proxy servers may indicate this error condition
             return 504;
         }
 

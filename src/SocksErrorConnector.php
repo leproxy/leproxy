@@ -16,14 +16,32 @@ use React\Promise\Timer\TimeoutException;
 class SocksErrorConnector implements ConnectorInterface
 {
     private $connector;
+    private $localOnly;
 
-    public function __construct(ConnectorInterface $connector)
+    public function __construct(ConnectorInterface $connector, $localOnly)
     {
         $this->connector = $connector;
+        $this->localOnly = $localOnly;
     }
 
     public function connect($uri)
     {
+        // If we are running in protected mode and the server does not have any authentication method set,
+        // then we verify the connection attempt is coming from a local address or reject right away.
+        // The server always includes the client address as a "source" query parameter, so we can parse its IP.
+        $args = array();
+        \parse_str(\parse_url($uri, \PHP_URL_QUERY), $args);
+        if ($this->localOnly && isset($args['source'])) {
+            $remote = \trim(\parse_url($args['source'], \PHP_URL_HOST), '[]');
+
+            if (!ConnectorFactory::isIpLocal($remote)) {
+                return \React\Promise\reject(new \RuntimeException(
+                    'Remote access denied in protected mode (EACCES)',
+                    \defined('SOCKET_ACCESS') ? \SOCKET_EACCES : 13
+                ));
+            }
+        }
+
         return $this->connector->connect($uri)->then(null, function (\Exception $e) {
             // report (only) explicit block list as ruleset violation
             if ($e->getCode() === ConnectorFactory::CODE_BLOCKED) {

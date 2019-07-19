@@ -39,7 +39,11 @@ class LoggingConnector implements ConnectorInterface
                 return $connection;
             },
             function (\Exception $e) use ($source, $uri) {
-                $this->logger->logFailConnection($source, $uri, $e->getMessage());
+                $this->logger->logFailConnection(
+                    $source,
+                    $uri,
+                    preg_replace('/^Connection to [^ ]+ /', '', $e->getMessage())
+                );
 
                 throw $e;
             }
