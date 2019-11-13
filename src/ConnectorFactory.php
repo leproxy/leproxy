@@ -120,8 +120,8 @@ class ConnectorFactory
             $uri = (string)substr($uri, 0, -2);
         }
 
-        $parts = parse_url('http://' . $uri);
-        if (!$parts || !isset($parts['scheme'], $parts['host']) || isset($parts['path']) || isset($parts['query']) || isset($parts['fragment'])) {
+        $parts = parse_url((stripos($uri, 'https://') === 0 ? '' : 'http://') . $uri);
+        if (!$parts || !isset($parts['scheme'], $parts['host']) || isset($parts['path']) || isset($parts['fragment'])) {
             throw new \InvalidArgumentException('Listening URI "' . $original . '" can not be parsed as a valid URI');
         }
 
