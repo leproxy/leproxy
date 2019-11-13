@@ -6,6 +6,7 @@ use Clue\React\Socks\Server as SocksServer;
 use React\EventLoop\LoopInterface;
 use React\Socket\Connector;
 use React\Socket\ConnectorInterface;
+use React\Socket\SecureServer as SecureSocket;
 use React\Socket\Server as Socket;
 
 /**
@@ -34,6 +35,17 @@ class LeProxyServer
      */
     public function listen($listen, $allowUnprotected)
     {
+        $tls = stripos($listen, 'https://') === 0;
+        if ($tls) {
+            $listen = substr($listen, 8);
+        }
+
+        $query = '';
+        if ($queryStart = strpos($listen, '?')) {
+            $query = substr($listen, $queryStart + 1);
+            $listen = substr($listen, 0, $queryStart);
+        }
+
         if (preg_match('/^(([^:]*):([^@]*)@)?(.?.?\/.*)$/', $listen, $parts)) {
             // match Unix domain sockets (UDS) paths like "[user:pass@]/path"
             $socket = new Socket('unix://' . $parts[4], $this->loop);
@@ -57,7 +69,14 @@ class LeProxyServer
                 $parts['port'] = 0;
             }
 
-            $socket = new Socket($parts['host'] . ':' . $parts['port'], $this->loop);
+            $address = $parts['host'] . ':' . $parts['port'];
+
+            $socket = new Socket($address, $this->loop);
+
+            if ($tls) {
+                \parse_str($query, $context);
+                $socket = new SecureSocket($socket, $this->loop, $context);
+            }
         }
 
         // require authentication if listening URI contains username/password
