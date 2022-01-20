@@ -275,7 +275,7 @@ class HttpProxyServer
             200,
             array(
                 'Content-Type' => 'application/x-ns-proxy-autoconfig',
-            ) + $this->headers,
+            ) + $this->headers, // @codeCoverageIgnoreStart
             <<<EOF
 function FindProxyForURL(url, host) {
     if (isPlainHostName(host) ||
@@ -293,7 +293,7 @@ function FindProxyForURL(url, host) {
 }
 
 EOF
-);
+        ); // @codeCoverageIgnoreEnd
     }
 
     /**

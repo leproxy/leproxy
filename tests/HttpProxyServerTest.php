@@ -264,4 +264,43 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('React\Promise\PromiseInterface', $promise);
     }
+
+    public function testCancelPlainRequestCLosesRequestAndRejectsPromise()
+    {
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
+        $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
+
+        $outgoing = $this->getMockBuilder('React\HttpClient\Request')->disableOriginalConstructor()->getMock();
+        $outgoing->expects($this->once())->method('close');
+
+        $client = $this->getMockBuilder('React\HttpClient\Client')->disableOriginalConstructor()->getMock();
+        $client->expects($this->once())
+            ->method('request')
+            ->with('GET', 'http://example.com/', array('User-Agent' => array()))
+            ->willReturn($outgoing);
+
+        $server = new HttpProxyServer($loop, $socket, $connector);
+
+        $ref = new ReflectionProperty($server, 'client');
+        $ref->setAccessible(true);
+        $ref->setValue($server, $client);
+
+        $request = new ServerRequest('GET', 'http://example.com/');
+        $request = $request->withRequestTarget((string)$request->getUri());
+
+        $promise = $server->handleRequest($request);
+
+        $promise->cancel();
+
+        $this->assertInstanceOf('React\Promise\PromiseInterface', $promise);
+
+        $exception = null;
+        $promise->then(null, function ($reason) use (&$exception) {
+            $exception = $reason;
+        });
+
+        $this->assertInstanceOf('RuntimeException', $exception);
+        $this->assertEquals('Request cancelled', $exception->getMessage());
+    }
 }
