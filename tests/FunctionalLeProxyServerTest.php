@@ -1,17 +1,17 @@
 <?php
 
+use Clue\React\Block;
+use LeProxy\LeProxy\ConnectorFactory;
 use LeProxy\LeProxy\LeProxyServer;
 use Psr\Http\Message\ServerRequestInterface;
-use React\Http\Server;
-use React\Socket\Server as Socket;
 use React\EventLoop\Factory;
-use React\Socket\Connector;
-use RingCentral\Psr7\Response;
-use React\Socket\ConnectionInterface;
-use Clue\React\Block;
+use React\Http\Server;
 use React\Promise\Stream;
+use React\Socket\ConnectionInterface;
+use React\Socket\Connector;
+use React\Socket\Server as Socket;
 use RingCentral\Psr7;
-use LeProxy\LeProxy\ConnectorFactory;
+use RingCentral\Psr7\Response;
 
 class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
 {
@@ -21,6 +21,8 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
     private $proxy;
 
     private $headers = array();
+
+    const TIMEOUT = 1.0;
 
     public function setUp()
     {
@@ -64,7 +66,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertNotContains("Server:", $response);
@@ -87,7 +89,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("Server: React\r\n", $response);
@@ -107,7 +109,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("\r\n\r\nGET / HTTP/1.1\r\n", $response);
@@ -124,7 +126,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 502 Bad Gateway\r\n", $response);
         $this->assertContains("Server: LeProxy\r\n", $response);
@@ -141,7 +143,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertNotContains("Server:", $response);
@@ -168,7 +170,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertNotContains("Server:", $response);
@@ -186,7 +188,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertNotContains("Server:", $response);
@@ -203,7 +205,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertNotContains("Server:", $response);
@@ -224,7 +226,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.2);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("Server: LeProxy\r\n", $response);
@@ -242,7 +244,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 502 Bad Gateway\r\n", $response);
         $this->assertContains("Server: LeProxy\r\n", $response);
@@ -268,7 +270,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.2);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("Server: LeProxy\r\n", $response);
@@ -295,7 +297,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.2);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 407 Proxy Authentication Required\r\n", $response);
         $this->assertContains("Server: LeProxy\r\n", $response);
@@ -317,7 +319,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.2);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("\x05\x00" . "\x05\x00\x00\x01\x00\x00\x00\x00\x00\x00", $response);
         $this->assertContains("HTTP/1.1 200 OK\r\n", $response);
@@ -344,7 +346,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.2);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertEquals("\x05\x00" . "\x05\x02\x00\x01\x00\x00\x00\x00\x00\x00", $response);
     }
@@ -359,7 +361,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("Server: LeProxy\r\n", $response);
@@ -376,7 +378,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 405 Method Not Allowed\r\n", $response);
     }
@@ -393,7 +395,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("PROXY", $response);
@@ -409,7 +411,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 502 Bad Gateway\r\n", $response);
         $this->assertContains("\r\n\r\nUnable to request:", $response);
@@ -431,7 +433,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.2);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 200 OK\r\n", $response);
         $this->assertContains("\r\n\r\nHTTP/1.1 200 OK\r\n", $response);
@@ -448,7 +450,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 400 Bad Request\r\n", $response);
         //$this->assertContains("Server: LeProxy\r\n", $response);
@@ -465,7 +467,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 411 Length Required\r\n", $response);
         $this->assertContains("Server: LeProxy", $response);
@@ -482,7 +484,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 501 Not Implemented\r\n", $response);
         $this->assertNotContains("Server: LeProxy", $response);
@@ -498,7 +500,7 @@ class FunctionalLeProxyServerTest extends PHPUnit_Framework_TestCase
             return Stream\buffer($conn);
         });
 
-        $response = Block\await($promise, $this->loop, 0.1);
+        $response = Block\await($promise, $this->loop, self::TIMEOUT);
 
         $this->assertStringStartsWith("HTTP/1.1 400 Bad Request\r\n", $response);
         $this->assertNotContains("Server: LeProxy", $response);
