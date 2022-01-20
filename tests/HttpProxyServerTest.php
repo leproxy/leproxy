@@ -15,7 +15,7 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
         $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
         $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
 
-        $server = new HttpProxyServer($loop, $socket, $connector);
+        new HttpProxyServer($loop, $socket, $connector);
     }
 
     public function testRequestWithoutAuthenticationReturnsAuthenticationRequired()
@@ -165,7 +165,7 @@ class HttpProxyServerTest extends PHPUnit_Framework_TestCase
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
         $socket = $this->getMockBuilder('React\Socket\ServerInterface')->getMock();
 
-        $promise = \React\Promise\reject(new RuntimeException('', SOCKET_ETIMEDOUT));
+        $promise = \React\Promise\reject(new RuntimeException('', defined('SOCKET_ETIMEDOUT') ? SOCKET_ETIMEDOUT : 110));
 
         $connector = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
         $connector->expects($this->once())->method('connect')->willReturn($promise);
