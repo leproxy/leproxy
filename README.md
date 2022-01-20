@@ -1,5 +1,7 @@
 # LeProxy
 
+[![CI status](https://github.com/leproxy/leproxy/actions/workflows/ci.yml/badge.svg)](https://github.com/leproxy/leproxy/actions)
+
 LeProxy is the HTTP/SOCKS proxy server for everybody!
 
 LeProxy is designed for anonymous surfing, improved security and privacy plus
@@ -267,7 +269,7 @@ tests.
 To run the test suite, go to the project root and run:
 
 ```bash
-$ php vendor/bin/phpunit
+$ vendor/bin/phpunit
 ```
 
 If you want to distribute LeProxy as a single standalone release file, you may
@@ -290,7 +292,7 @@ acceptance test setup which can also be used to check the resulting release
 file:
 
 ```bash
-$ ./tests/acceptance.sh
+$ tests/acceptance.sh
 ```
 
 > Note that the acceptance tests will try to locate a `leproxy*.php` file in
