@@ -1,6 +1,8 @@
 # LeProxy
 
 [![CI status](https://github.com/leproxy/leproxy/actions/workflows/ci.yml/badge.svg)](https://github.com/leproxy/leproxy/actions)
+[![downloads on GitHub](https://img.shields.io/github/downloads/leproxy/leproxy/total?color=blue&label=downloads%20on%20GitHub)](https://github.com/leproxy/leproxy/releases)
+[![installs on Packagist](https://img.shields.io/packagist/dt/leproxy/leproxy?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/leproxy/leproxy)  
 
 LeProxy is the HTTP/SOCKS proxy server for everybody!
 
