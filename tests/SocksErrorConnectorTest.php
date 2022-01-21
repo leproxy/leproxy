@@ -1,8 +1,8 @@
 <?php
 
+use LeProxy\LeProxy\ConnectorFactory;
 use LeProxy\LeProxy\SocksErrorConnector;
 use React\Promise\Promise;
-use LeProxy\LeProxy\ConnectorFactory;
 
 class SocksErrorConnectorTest extends PHPUnit_Framework_TestCase
 {
@@ -36,12 +36,12 @@ class SocksErrorConnectorTest extends PHPUnit_Framework_TestCase
             $code = $e->getCode();
         });
 
-        $this->assertEquals(SOCKET_EACCES, $code);
+        $this->assertEquals(defined('SOCKET_EACCES') ? SOCKET_EACCES : 13, $code);
     }
 
     public function testConnectWillThrowErrorForDirectError()
     {
-        $promise = \React\Promise\reject(new RuntimeException('test', SOCKET_ECONNREFUSED));
+        $promise = \React\Promise\reject(new RuntimeException('test', defined('SOCKET_ECONNREFUSED') ? SOCKET_ECONNREFUSED : 111));
 
         $base = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
         $base->expects($this->once())->method('connect')->with('example.com:1234')->willReturn($promise);
@@ -55,12 +55,12 @@ class SocksErrorConnectorTest extends PHPUnit_Framework_TestCase
             $code = $e->getCode();
         });
 
-        $this->assertEquals(SOCKET_ECONNREFUSED, $code);
+        $this->assertEquals(defined('SOCKET_ECONNREFUSED') ? SOCKET_ECONNREFUSED : 111, $code);
     }
 
     public function testConnectWillThrowGenericErrorForNestedError()
     {
-        $promise = \React\Promise\reject(new RuntimeException('test', SOCKET_ECONNREFUSED, new RuntimeException()));
+        $promise = \React\Promise\reject(new RuntimeException('test', defined('SOCKET_ECONNREFUSED') ? SOCKET_ECONNREFUSED : 111, new RuntimeException()));
 
         $base = $this->getMockBuilder('React\Socket\ConnectorInterface')->getMock();
         $base->expects($this->once())->method('connect')->with('example.com:1234')->willReturn($promise);
@@ -121,6 +121,6 @@ class SocksErrorConnectorTest extends PHPUnit_Framework_TestCase
             $code = $e->getCode();
         });
 
-        $this->assertEquals(SOCKET_EACCES, $code);
+        $this->assertEquals(defined('SOCKET_EACCES') ? SOCKET_EACCES : 13, $code);
     }
 }
