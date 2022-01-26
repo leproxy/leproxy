@@ -1,0 +1,7 @@
+/.gitattributes export-ignore
+/.github/workflows/ export-ignore
+/.gitignore export-ignore
+/compile.php export-ignore
+/composer.lock export-ignore
+/phpunit.xml.dist export-ignore
+/tests/ export-ignore
