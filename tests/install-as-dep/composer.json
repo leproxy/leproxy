@@ -1,0 +1,14 @@
+{
+    "require": {
+        "leproxy/leproxy": "*@dev"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../",
+            "options": {
+                "symlink": false
+            }
+        }
+    ]
+}
