@@ -29,3 +29,5 @@ jobs:
       - run: vendor/bin/phpunit --coverage-text
       - run: php compile.php
       - run: tests/acceptance.sh
+      - run: composer --working-dir=tests/install-as-dep install
+      - run: tests/acceptance.sh tests/install-as-dep/vendor/bin/leproxy.php

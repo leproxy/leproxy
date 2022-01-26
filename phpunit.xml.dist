@@ -9,6 +9,7 @@
     <testsuites>
         <testsuite>
             <directory>./tests/</directory>
+            <exclude>./tests/install-as-dep/</exclude>
         </testsuite>
     </testsuites>
     <filter>
