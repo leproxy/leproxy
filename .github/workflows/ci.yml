@@ -26,7 +26,13 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: xdebug
       - run: composer install
-      - run: vendor/bin/phpunit --coverage-text
+      - run: vendor/bin/phpunit --coverage-text --coverage-clover=clover.xml
+      - name: Check 100% code coverage
+        shell: php {0}
+        run: |
+          <?php
+          $metrics = simplexml_load_file('clover.xml')->project->metrics;
+          exit((int) $metrics['statements'] === (int) $metrics['coveredstatements'] ? 0 : 1);
       - run: php compile.php
       - run: tests/acceptance.sh
       - run: composer --working-dir=tests/install-as-dep install
