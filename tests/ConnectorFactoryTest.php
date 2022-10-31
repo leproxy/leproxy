@@ -93,7 +93,6 @@ class ConnectorFactoryTest extends PHPUnit_Framework_TestCase
             'wildcard hostname' => '*:8080',
             'excessive scheme' => 'http://127.0.0.1:8080',
             'excessive path' => '127.0.0.1:8080/root',
-            'excessive query' => '127.0.0.1:8080?query',
             'excessive fragment' => '127.0.0.1:8080#fragment',
 
             'excessive dots' => '.../proxy.sock',
